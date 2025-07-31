@@ -15,7 +15,7 @@ public class ActiveStateTCable : TCableBase<bool>
 
     protected override void RewindAction(bool curValue)
     {
-        if(gameObject.activeInHierarchy != curValue)
+        if (gameObject.activeInHierarchy != curValue)
             gameObject.SetActive(curValue);
     }
 

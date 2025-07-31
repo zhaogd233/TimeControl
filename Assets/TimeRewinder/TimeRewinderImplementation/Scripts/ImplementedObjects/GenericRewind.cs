@@ -2,16 +2,24 @@
 
 public class GenericRewind : RewindAbstract
 {
-    [Tooltip("Tracking active state of the object that this script is attached to")]
-    [SerializeField] bool trackObjectActiveState;
-    [Tooltip("Tracking Position,Rotation and Scale")]
-    [SerializeField] bool trackTransform;
-    [SerializeField] bool trackVelocity;
-    [SerializeField] bool trackAnimator;
-    [SerializeField] bool trackAudio;
+    [Tooltip("Tracking active state of the object that this script is attached to")] [SerializeField]
+    private bool trackObjectActiveState;
 
-    [Tooltip("Enable checkbox on right side to track particles")]
-    [SerializeField] OptionalParticleSettings trackParticles;
+    [Tooltip("Tracking Position,Rotation and Scale")] [SerializeField]
+    private bool trackTransform;
+
+    [SerializeField] private bool trackVelocity;
+    [SerializeField] private bool trackAnimator;
+    [SerializeField] private bool trackAudio;
+
+    [Tooltip("Enable checkbox on right side to track particles")] [SerializeField]
+    private OptionalParticleSettings trackParticles;
+
+    private void Start()
+    {
+        if (trackParticles.Enabled)
+            InitializeParticles(trackParticles.Value);
+    }
 
     public override void Rewind(float seconds)
     {
@@ -26,7 +34,7 @@ public class GenericRewind : RewindAbstract
         if (trackAudio)
             RestoreAudio(seconds);
         if (trackParticles.Enabled)
-            RestoreParticles(seconds);       
+            RestoreParticles(seconds);
     }
 
     public override void Track()
@@ -42,12 +50,6 @@ public class GenericRewind : RewindAbstract
         if (trackAudio)
             TrackAudio();
         if (trackParticles.Enabled)
-            TrackParticles();      
-    }
-    private void Start()
-    {
-        if(trackParticles.Enabled)
-            InitializeParticles(trackParticles.Value);
+            TrackParticles();
     }
 }
-

@@ -2,27 +2,28 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 /// <summary>
-/// In latest version, Scale tracking/rewind was added defaultly to GenericRewind alongside with tracking position and rotation. Script is still here to only show how it internally works in the simplest way possible
+///     In latest version, Scale tracking/rewind was added defaultly to GenericRewind alongside with tracking position and
+///     rotation. Script is still here to only show how it internally works in the simplest way possible
 /// </summary>
 [Obsolete]
 //This script is showing setup of simple custom variable tracking
-public class ScaleRewind : RewindAbstract           
+public class ScaleRewind : RewindAbstract
 {
-    [SerializeField] Slider scaleSlider;
+    [SerializeField] private Slider scaleSlider;
 
-    CircularBuffer<Vector3> trackedObjectScales;       //For storing data, use this CircularBuffer class
+    private CircularBuffer<Vector3> trackedObjectScales; //For storing data, use this CircularBuffer class
 
     private void Start()
     {
-        trackedObjectScales = new CircularBuffer<Vector3>();        //Circular buffer must be initialized in start method, it cannot use field initialization
+        trackedObjectScales =
+            new CircularBuffer<Vector3>(); //Circular buffer must be initialized in start method, it cannot use field initialization
     }
 
     //In this method define what will be tracked. In our case we want only track our custom added variable scale tracking
     public override void Track()
     {
-        TrackObjectScale();      
+        TrackObjectScale();
     }
 
     //In this method define, what will be restored on time rewinding. In our case we want to restore object scale
@@ -36,7 +37,7 @@ public class ScaleRewind : RewindAbstract
     {
         trackedObjectScales.WriteLastValue(transform.localScale);
     }
-    
+
     // This is an example of custom variable restoring
     public void RestoreObjectScale(float seconds)
     {

@@ -5,12 +5,12 @@ using UnityEngine;
 
 public abstract class RewindAbstract : MonoBehaviour
 {
-    Rigidbody body;
-    Rigidbody2D body2;
-    Animator animator;
-    AudioSource audioSource;
-   
-    
+    private Animator animator;
+    private AudioSource audioSource;
+    private Rigidbody body;
+    private Rigidbody2D body2;
+
+
     public void MainInit()
     {
         body = GetComponent<Rigidbody>();
@@ -22,40 +22,62 @@ public abstract class RewindAbstract : MonoBehaviour
         trackedTransformValues = new CircularBuffer<TransformValues>();
         trackedAnimationParameters = new List<CircularBuffer<AnimatorCustomParameter>>();
 
-        if(body!=null||body2!=null)
+        if (body != null || body2 != null)
             trackedVelocities = new CircularBuffer<VelocityValues>();
 
         if (animator != null)
         {
             trackedAnimationTimes = new List<CircularBuffer<AnimationValues>>();
-            for (int i = 0; i < animator.layerCount; i++)
+            for (var i = 0; i < animator.layerCount; i++)
                 trackedAnimationTimes.Add(new CircularBuffer<AnimationValues>());
 
             animatorParameters = animator.parameters;
-            for (int i = 0; i < animator.parameterCount; i++)
+            for (var i = 0; i < animator.parameterCount; i++)
                 trackedAnimationParameters.Add(new CircularBuffer<AnimatorCustomParameter>());
         }
 
-        if(audioSource!=null)
+        if (audioSource != null)
             trackedAudioTimes = new CircularBuffer<AudioTrackedData>();
 
         Application.logMessageReceivedThreaded += LogMessageCatcher;
     }
-    #region ActiveState
-    public bool IsManagerTrackingActiveState { get; set; } = false;
-    public bool IsActiveStateTracked { get; set; } = false;
-    CircularBuffer<bool> trackedActiveStates;
+
+    private void LogMessageCatcher(string condition, string stackTrace, LogType type)
+    {
+        if (condition == "Animator.GotoState: State could not be found")
+            Debug.LogError(
+                $"Rewind error: There cannot be custom clip names in animator if you use transitions! Replace custom clip names in Animator:{animator.runtimeAnimatorController.name} with the original names!");
+    }
 
     /// <summary>
-    /// Call this method in Track() if you want to track object active state
+    ///     Main method where all tracking is filled, choose what will be tracked for specific object
+    /// </summary>
+    public abstract void Track();
+
+
+    /// <summary>
+    ///     Main method where all rewinding is filled, choose what will be rewinded for specific object
+    /// </summary>
+    /// <param name="seconds">Parameter defining how many seconds you want to rewind back</param>
+    public abstract void Rewind(float seconds);
+
+    #region ActiveState
+
+    public bool IsManagerTrackingActiveState { get; set; } = false;
+    public bool IsActiveStateTracked { get; set; }
+    private CircularBuffer<bool> trackedActiveStates;
+
+    /// <summary>
+    ///     Call this method in Track() if you want to track object active state
     /// </summary>
     public void TrackObjectActiveState()
     {
         IsActiveStateTracked = true;
         trackedActiveStates.WriteLastValue(gameObject.activeSelf);
     }
+
     /// <summary>
-    /// Call this method in Rewind() to restore object active state
+    ///     Call this method in Rewind() to restore object active state
     /// </summary>
     /// <param name="seconds">Use seconds parameter from Rewind() method</param>
     public void RestoreObjectActiveState(float seconds)
@@ -67,16 +89,17 @@ public abstract class RewindAbstract : MonoBehaviour
 
     #region Transform
 
-    CircularBuffer<TransformValues> trackedTransformValues;
+    private CircularBuffer<TransformValues> trackedTransformValues;
+
     public struct TransformValues
     {
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 scale;
     }
-    
+
     /// <summary>
-    /// Call this method in Track() if you want to track object Transforms (position, rotation and scale)
+    ///     Call this method in Track() if you want to track object Transforms (position, rotation and scale)
     /// </summary>
     protected void TrackTransform()
     {
@@ -86,41 +109,45 @@ public abstract class RewindAbstract : MonoBehaviour
         valuesToWrite.scale = transform.localScale;
         trackedTransformValues.WriteLastValue(valuesToWrite);
     }
+
     /// <summary>
-    /// Call this method in Rewind() to restore Transform
+    ///     Call this method in Rewind() to restore Transform
     /// </summary>
     /// <param name="seconds">Use seconds parameter from Rewind() method</param>
     protected void RestoreTransform(float seconds)
     {
-        TransformValues valuesToRead = trackedTransformValues.ReadFromBuffer(seconds);
+        var valuesToRead = trackedTransformValues.ReadFromBuffer(seconds);
         transform.SetPositionAndRotation(valuesToRead.position, valuesToRead.rotation);
-        transform.localScale= valuesToRead.scale;
+        transform.localScale = valuesToRead.scale;
     }
+
     #endregion
 
     #region Velocity
+
     public struct VelocityValues
     {
         public Vector3 velocity;
         public Vector3 angularVelocity;
         public float angularVelocity2D;
     }
-    CircularBuffer<VelocityValues> trackedVelocities;
+
+    private CircularBuffer<VelocityValues> trackedVelocities;
 
     /// <summary>
-    /// Call this method in Track() if you want to track velocity of Rigidbody
+    ///     Call this method in Track() if you want to track velocity of Rigidbody
     /// </summary>
     protected void TrackVelocity()
     {
         if (body != null)
         {
             VelocityValues valuesToWrite;
-            valuesToWrite.velocity= body.velocity;
+            valuesToWrite.velocity = body.velocity;
             valuesToWrite.angularVelocity = body.angularVelocity;
             valuesToWrite.angularVelocity2D = 0;
-            trackedVelocities.WriteLastValue(valuesToWrite);            
+            trackedVelocities.WriteLastValue(valuesToWrite);
         }
-        else if (body2!=null)
+        else if (body2 != null)
         {
             VelocityValues valuesToWrite;
             valuesToWrite.velocity = body2.velocity;
@@ -135,30 +162,32 @@ public abstract class RewindAbstract : MonoBehaviour
     }
 
     /// <summary>
-    /// Call this method in Rewind() to restore velocity of Rigidbody
+    ///     Call this method in Rewind() to restore velocity of Rigidbody
     /// </summary>
     /// <param name="seconds">Use seconds parameter from Rewind() method</param>
     protected void RestoreVelocity(float seconds)
-    {   
-        if(body!=null)
+    {
+        if (body != null)
         {
-            VelocityValues valuesToRead= trackedVelocities.ReadFromBuffer(seconds);
+            var valuesToRead = trackedVelocities.ReadFromBuffer(seconds);
             body.velocity = valuesToRead.velocity;
             body.angularVelocity = valuesToRead.angularVelocity;
         }
         else
         {
-            VelocityValues valuesToRead = trackedVelocities.ReadFromBuffer(seconds);
+            var valuesToRead = trackedVelocities.ReadFromBuffer(seconds);
             body2.velocity = valuesToRead.velocity;
             body2.angularVelocity = valuesToRead.angularVelocity2D;
         }
     }
+
     #endregion
 
     #region Animator
-    List<CircularBuffer<AnimationValues>> trackedAnimationTimes;         //All animator layers are tracked
-    List<CircularBuffer<AnimatorCustomParameter>> trackedAnimationParameters;
-    AnimatorControllerParameter[] animatorParameters;
+
+    private List<CircularBuffer<AnimationValues>> trackedAnimationTimes; //All animator layers are tracked
+    private List<CircularBuffer<AnimatorCustomParameter>> trackedAnimationParameters;
+    private AnimatorControllerParameter[] animatorParameters;
 
     public struct AnimatorCustomParameter
     {
@@ -166,6 +195,7 @@ public abstract class RewindAbstract : MonoBehaviour
         public AnimatorControllerParameterType type;
         public float value;
     }
+
     public struct AnimationValues
     {
         public float animationStateTime;
@@ -173,6 +203,7 @@ public abstract class RewindAbstract : MonoBehaviour
         public int animationHash;
         public AnimatorTransitionData transitionsInfo;
     }
+
     public struct AnimatorTransitionData
     {
         public bool isInTransition;
@@ -182,12 +213,13 @@ public abstract class RewindAbstract : MonoBehaviour
         public float clipLength;
         public DurationUnit durationUnit;
     }
+
     /// <summary>
-    /// Call this method in Track() if you want to track Animator states
+    ///     Call this method in Track() if you want to track Animator states
     /// </summary>
     protected void TrackAnimator()
     {
-        if(animator == null)
+        if (animator == null)
         {
             Debug.LogError("Cannot find Animator on the object, while TrackAnimator() is being called!!!");
             return;
@@ -195,18 +227,18 @@ public abstract class RewindAbstract : MonoBehaviour
 
         animator.speed = 1;
 
-        for (int i = 0; i < animator.layerCount; i++)
+        for (var i = 0; i < animator.layerCount; i++)
         {
-            AnimatorStateInfo animatorInfo = animator.GetCurrentAnimatorStateInfo(i);
+            var animatorInfo = animator.GetCurrentAnimatorStateInfo(i);
 
-            AnimatorClipInfo[] transitionClip = animator.GetNextAnimatorClipInfo(i);
+            var transitionClip = animator.GetNextAnimatorClipInfo(i);
 
             AnimatorTransitionData transitionData;
-            bool hasWrittenToBuffer = trackedAnimationTimes[i].TryReadLastValue(out AnimationValues lastReadValue);
+            var hasWrittenToBuffer = trackedAnimationTimes[i].TryReadLastValue(out var lastReadValue);
 
             if (transitionClip.Length > 0)
             {
-                AnimatorTransitionInfo unreliableTran = animator.GetAnimatorTransitionInfo(0);
+                var unreliableTran = animator.GetAnimatorTransitionInfo(0);
 
                 transitionData.isInTransition = true;
                 transitionData.targetStateName = Animator.StringToHash(transitionClip[0].clip.name);
@@ -231,8 +263,11 @@ public abstract class RewindAbstract : MonoBehaviour
 
             if (hasWrittenToBuffer && valuesToWrite.animationHash == lastReadValue.animationHash)
             {
-                valuesToWrite.clipLength = lastReadValue.clipLength;                                                //Workaround because sometimes internally lengths are infinity...
-                valuesToWrite.animationStateTime = lastReadValue.animationStateTime + Time.fixedDeltaTime;          //Needs to do it manually due to not totally synced transition by default
+                valuesToWrite.clipLength =
+                    lastReadValue.clipLength; //Workaround because sometimes internally lengths are infinity...
+                valuesToWrite.animationStateTime =
+                    lastReadValue.animationStateTime +
+                    Time.fixedDeltaTime; //Needs to do it manually due to not totally synced transition by default
             }
             else
             {
@@ -243,7 +278,7 @@ public abstract class RewindAbstract : MonoBehaviour
             trackedAnimationTimes[i].WriteLastValue(valuesToWrite);
         }
 
-        for (int i = 0; i < animatorParameters.Length; i++)
+        for (var i = 0; i < animatorParameters.Length; i++)
         {
             var val = animatorParameters[i];
             AnimatorCustomParameter par;
@@ -255,40 +290,45 @@ public abstract class RewindAbstract : MonoBehaviour
     }
 
     /// <summary>
-    /// Call this method in Rewind() to restore Animator state
+    ///     Call this method in Rewind() to restore Animator state
     /// </summary>
     /// <param name="seconds">Use seconds parameter from Rewind() method</param>
     protected void RestoreAnimator(float seconds)
     {
         animator.speed = 0;
 
-        for (int i=0;i<animator.layerCount;i++)
+        for (var i = 0; i < animator.layerCount; i++)
         {
-            AnimationValues readValues = trackedAnimationTimes[i].ReadFromBuffer(seconds,out bool wasLastAccessedIndexSame);
+            var readValues = trackedAnimationTimes[i].ReadFromBuffer(seconds, out var wasLastAccessedIndexSame);
 
-            if (!readValues.transitionsInfo.isInTransition&&wasLastAccessedIndexSame)
+            if (!readValues.transitionsInfo.isInTransition && wasLastAccessedIndexSame)
                 return;
 
-            animator.Play(readValues.animationHash, i, readValues.animationStateTime/readValues.clipLength);
+            animator.Play(readValues.animationHash, i, readValues.animationStateTime / readValues.clipLength);
 
-            if (readValues.transitionsInfo.isInTransition)     //If there is some transition
+            if (readValues.transitionsInfo.isInTransition) //If there is some transition
             {
                 animator.Update(0);
 
-                if(readValues.transitionsInfo.durationUnit==DurationUnit.Fixed)
-                    animator.CrossFadeInFixedTime(readValues.transitionsInfo.targetStateName, readValues.transitionsInfo.transitionLength, i, 0, readValues.transitionsInfo.normalizedTimeInTransition);
+                if (readValues.transitionsInfo.durationUnit == DurationUnit.Fixed)
+                    animator.CrossFadeInFixedTime(readValues.transitionsInfo.targetStateName,
+                        readValues.transitionsInfo.transitionLength, i, 0,
+                        readValues.transitionsInfo.normalizedTimeInTransition);
                 else
-                    animator.CrossFade(readValues.transitionsInfo.targetStateName, readValues.transitionsInfo.transitionLength, i, 0, readValues.transitionsInfo.normalizedTimeInTransition);
+                    animator.CrossFade(readValues.transitionsInfo.targetStateName,
+                        readValues.transitionsInfo.transitionLength, i, 0,
+                        readValues.transitionsInfo.normalizedTimeInTransition);
             }
         }
 
-        for (int i = 0; i < trackedAnimationParameters.Count; i++)
+        for (var i = 0; i < trackedAnimationParameters.Count; i++)
         {
-            AnimatorCustomParameter par = trackedAnimationParameters[i].ReadFromBuffer(seconds);
+            var par = trackedAnimationParameters[i].ReadFromBuffer(seconds);
             ApplyParametersToAnimator(par);
         }
     }
-    float GetValueFromAnimatorParameter(AnimatorControllerParameter par)
+
+    private float GetValueFromAnimatorParameter(AnimatorControllerParameter par)
     {
         switch (par.type)
         {
@@ -300,18 +340,20 @@ public abstract class RewindAbstract : MonoBehaviour
             case AnimatorControllerParameterType.Int:
                 return animator.GetInteger(par.name);
         }
+
         return 0;
     }
+
     public void ApplyParametersToAnimator(AnimatorCustomParameter parameter)
     {
         switch (parameter.type)
         {
             case AnimatorControllerParameterType.Bool:
-                animator.SetBool(parameter.parameterHash, (parameter.value == 0) ? false : true);
+                animator.SetBool(parameter.parameterHash, parameter.value == 0 ? false : true);
                 break;
 
             case AnimatorControllerParameterType.Float:
-                animator.SetFloat(parameter.parameterHash, (float)parameter.value);
+                animator.SetFloat(parameter.parameterHash, parameter.value);
                 break;
 
             case AnimatorControllerParameterType.Int:
@@ -325,11 +367,14 @@ public abstract class RewindAbstract : MonoBehaviour
                 break;
         }
     }
+
     #endregion
 
     #region Audio
-    CircularBuffer<AudioTrackedData> trackedAudioTimes;
-    AudioTrackedData? _immediateRefreshAudioValues = null;
+
+    private CircularBuffer<AudioTrackedData> trackedAudioTimes;
+    private AudioTrackedData? _immediateRefreshAudioValues;
+
     public struct AudioTrackedData
     {
         public float time;
@@ -338,12 +383,13 @@ public abstract class RewindAbstract : MonoBehaviour
         public float trackedPitch;
         public float trackedVolume;
     }
+
     /// <summary>
-    /// Call this method in Track() if you want to track Audio
+    ///     Call this method in Track() if you want to track Audio
     /// </summary>
     protected void TrackAudio()
     {
-        if(audioSource==null)
+        if (audioSource == null)
         {
             Debug.LogError("Cannot find AudioSource on the object, while TrackAudio() is being called!!!");
             return;
@@ -365,41 +411,40 @@ public abstract class RewindAbstract : MonoBehaviour
         dataToWrite.isPlaying = audioSource.isPlaying;
         dataToWrite.trackedPitch = audioSource.pitch;
 
-        trackedAudioTimes.WriteLastValue(dataToWrite);      
+        trackedAudioTimes.WriteLastValue(dataToWrite);
     }
 
     /// <summary>
-    /// Call this method in Rewind() to restore Audio
+    ///     Call this method in Rewind() to restore Audio
     /// </summary>
     /// <param name="seconds">Use seconds parameter from Rewind() method</param>
     protected void RestoreAudio(float seconds)
     {
-        _immediateRefreshAudioValues = trackedAudioTimes.ReadFromBuffer(seconds,out bool wasLastAccessedIndexSame);
+        _immediateRefreshAudioValues = trackedAudioTimes.ReadFromBuffer(seconds, out var wasLastAccessedIndexSame);
 
         if (wasLastAccessedIndexSame)
             return;
 
         audioSource.enabled = _immediateRefreshAudioValues.Value.isEnabled;
-        if(_immediateRefreshAudioValues.Value.isPlaying)
+        if (_immediateRefreshAudioValues.Value.isPlaying)
         {
             audioSource.mute = true;
 
-            if (!audioSource.isPlaying)
-            {  
-                audioSource.Play();
-            }
+            if (!audioSource.isPlaying) audioSource.Play();
         }
-        else if(audioSource.isPlaying)
+        else if (audioSource.isPlaying)
         {
             audioSource.Stop();
         }
     }
+
     #endregion
 
     #region Particles
+
     private float particleTimeLimiter;
     private float particleResetTimeTo;
-    List<CircularBuffer<ParticleTrackedData>> trackedParticleTimes = new List<CircularBuffer<ParticleTrackedData>>();
+    private readonly List<CircularBuffer<ParticleTrackedData>> trackedParticleTimes = new();
 
     public struct ParticleTrackedData
     {
@@ -410,34 +455,35 @@ public abstract class RewindAbstract : MonoBehaviour
     private List<ParticleSystem> particleSystemsData;
 
     /// <summary>
-    /// Particle settings to setup particles in custom variable tracking
+    ///     Particle settings to setup particles in custom variable tracking
     /// </summary>
     [Serializable]
     public struct ParticlesSetting
     {
         [Tooltip("For long lasting particle systems, set time tracking limit to drastically improve performance ")]
         public float particleTrackingLimit;
-        [Tooltip("Variable defining from which second should the particle system be restarted after tracking limit was hit. Play with this variable to get better results, so the tracking resets are not much noticeable.")]
+
+        [Tooltip(
+            "Variable defining from which second should the particle system be restarted after tracking limit was hit. Play with this variable to get better results, so the tracking resets are not much noticeable.")]
         public float particleRestartFrom;
+
         public List<ParticleSystem> particleSystems;
     }
 
     /// <summary>
-    /// Use this method first when using particle rewinding implementation
+    ///     Use this method first when using particle rewinding implementation
     /// </summary>
     /// <param name="particleSettings"></param>
     protected void InitializeParticles(ParticlesSetting particleSettings)
     {
-        if(particleSettings.particleSystems.Any(x=>x==null))
-        {
+        if (particleSettings.particleSystems.Any(x => x == null))
             Debug.LogError("Initialized particle system are missing data. Some particle systems are not filled.");
-        }
         particleSystemsData = particleSettings.particleSystems;
         particleTimeLimiter = particleSettings.particleTrackingLimit;
         particleResetTimeTo = particleSettings.particleRestartFrom;
         particleSystemsData.ForEach(x => trackedParticleTimes.Add(new CircularBuffer<ParticleTrackedData>()));
 
-        foreach (CircularBuffer<ParticleTrackedData> i in trackedParticleTimes)
+        foreach (var i in trackedParticleTimes)
         {
             ParticleTrackedData trackedData;
             trackedData.particleTime = 0;
@@ -445,81 +491,66 @@ public abstract class RewindAbstract : MonoBehaviour
             i.WriteLastValue(trackedData);
         }
     }
+
     /// <summary>
-    /// Call this method in Track() if you want to track Particles (Note that InitializeParticles() must be called beforehand)
+    ///     Call this method in Track() if you want to track Particles (Note that InitializeParticles() must be called
+    ///     beforehand)
     /// </summary>
     protected void TrackParticles()
     {
-        if(particleSystemsData==null)
+        if (particleSystemsData == null)
         {
             Debug.LogError("Particles not initialized!!! Call InitializeParticles() before the tracking starts");
             return;
         }
-        if(particleSystemsData.Count==0)
+
+        if (particleSystemsData.Count == 0)
             Debug.LogError("Particles Data not filled!!! Fill Particles Data in the Unity Editor");
 
         try
         {
-            for (int i = 0; i < particleSystemsData.Count; i++)
+            for (var i = 0; i < particleSystemsData.Count; i++)
             {
                 if (particleSystemsData[i].isPaused)
                     particleSystemsData[i].Play();
 
-                trackedParticleTimes[i].TryReadLastValue(out ParticleTrackedData lastValue);
-                float addTime = lastValue.particleTime + Time.fixedDeltaTime;
+                trackedParticleTimes[i].TryReadLastValue(out var lastValue);
+                var addTime = lastValue.particleTime + Time.fixedDeltaTime;
 
                 ParticleTrackedData particleData;
                 particleData.isActive = particleSystemsData[i].gameObject.activeInHierarchy;
 
-                if ((!lastValue.isActive) && (particleData.isActive))
+                if (!lastValue.isActive && particleData.isActive)
                     particleData.particleTime = 0;
                 else if (!particleData.isActive)
                     particleData.particleTime = 0;
                 else
-                    particleData.particleTime = (addTime > particleTimeLimiter) ? particleResetTimeTo : addTime;
+                    particleData.particleTime = addTime > particleTimeLimiter ? particleResetTimeTo : addTime;
 
                 trackedParticleTimes[i].WriteLastValue(particleData);
             }
         }
         catch
         {
-            Debug.LogError("Particles Data not filled properly!!! Fill both the Particle System and Particle Main Object fields for each element");
+            Debug.LogError(
+                "Particles Data not filled properly!!! Fill both the Particle System and Particle Main Object fields for each element");
         }
-
     }
+
     /// <summary>
-    /// Call this method in Rewind() to restore Particles
+    ///     Call this method in Rewind() to restore Particles
     /// </summary>
     /// <param name="seconds">Use seconds parameter from Rewind() method</param>
     protected void RestoreParticles(float seconds)
     {
-        for (int i = 0; i < particleSystemsData.Count; i++)
+        for (var i = 0; i < particleSystemsData.Count; i++)
         {
-            ParticleTrackedData particleTracked = trackedParticleTimes[i].ReadFromBuffer(seconds,out bool wasLastAccessedIndexSame);  
-            
-            if(!wasLastAccessedIndexSame)
-                particleSystemsData[i].Simulate(particleTracked.particleTime, false, true, false);          
+            var particleTracked = trackedParticleTimes[i].ReadFromBuffer(seconds, out var wasLastAccessedIndexSame);
+
+            if (!wasLastAccessedIndexSame)
+                particleSystemsData[i].Simulate(particleTracked.particleTime, false, true, false);
         }
     }
+
     #endregion
-
-    void LogMessageCatcher(string condition, string stackTrace, LogType type)
-    {
-        if(condition== "Animator.GotoState: State could not be found")
-        {
-            Debug.LogError($"Rewind error: There cannot be custom clip names in animator if you use transitions! Replace custom clip names in Animator:{animator.runtimeAnimatorController.name} with the original names!");
-        }
-    }
-    /// <summary>
-    /// Main method where all tracking is filled, choose what will be tracked for specific object
-    /// </summary>
-    public abstract void Track();
-
-
-    /// <summary>
-    /// Main method where all rewinding is filled, choose what will be rewinded for specific object
-    /// </summary>
-    /// <param name="seconds">Parameter defining how many seconds you want to rewind back</param>
-    public abstract void Rewind(float seconds);
-
-}      
+}

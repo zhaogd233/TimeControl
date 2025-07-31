@@ -1,35 +1,35 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class CircularBuffer <T>
-{ 
-    T[] dataArray;
-    int bufferCurrentPosition = -1;
-    int bufferCapacity;
-    float howManyRecordsPerSecond;
-    int lastAccessedIndex = -1;
+public class CircularBuffer<T>
+{
+    private readonly int bufferCapacity;
+    private int bufferCurrentPosition = -1;
+    private readonly T[] dataArray;
+    private readonly float howManyRecordsPerSecond;
+    private int lastAccessedIndex = -1;
 
 
     /// <summary>
-    /// Use circular buffer structure for time rewinding
+    ///     Use circular buffer structure for time rewinding
     /// </summary>
     public CircularBuffer()
     {
         try
         {
             howManyRecordsPerSecond = 1 / Time.fixedDeltaTime;
-            bufferCapacity = (int)(RewindManager.Instance.HowManySecondsToTrack *howManyRecordsPerSecond);
+            bufferCapacity = (int)(RewindManager.Instance.HowManySecondsToTrack * howManyRecordsPerSecond);
             dataArray = new T[bufferCapacity];
             RewindManager.BuffersRestore += MoveLastBufferPosition;
         }
         catch
         {
-            Debug.LogError("Circular buffer cannot use field initialization (Time.fixedDeltaTime is unknown yet). Initialize Circular buffer in Start() method!");
-        }        
+            Debug.LogError(
+                "Circular buffer cannot use field initialization (Time.fixedDeltaTime is unknown yet). Initialize Circular buffer in Start() method!");
+        }
     }
-    
+
     /// <summary>
-    /// Write value to the last position of the buffer if Tracking is enabled
+    ///     Write value to the last position of the buffer if Tracking is enabled
     /// </summary>
     /// <param name="val"></param>
     public void WriteLastValue(T val)
@@ -48,8 +48,9 @@ public class CircularBuffer <T>
             }
         }
     }
+
     /// <summary>
-    /// Try read last value that was written to buffer
+    ///     Try read last value that was written to buffer
     /// </summary>
     /// <returns></returns>
     public bool TryReadLastValue(out T value)
@@ -59,52 +60,57 @@ public class CircularBuffer <T>
             value = dataArray[bufferCurrentPosition];
             return true;
         }
-        else
-        {
-            value = default;
-            return false;
-        }
+
+        value = default;
+        return false;
     }
 
     /// <summary>
-    /// Read specified value from circular buffer
+    ///     Read specified value from circular buffer
     /// </summary>
-    /// <param name="seconds">Variable defining how many seconds into the past should be read (eg. seconds=5 then function will return the values that tracked object had exactly 5 seconds ago)</param>
+    /// <param name="seconds">
+    ///     Variable defining how many seconds into the past should be read (eg. seconds=5 then function will
+    ///     return the values that tracked object had exactly 5 seconds ago)
+    /// </param>
     /// <returns></returns>
     public T ReadFromBuffer(float seconds)
     {
         return dataArray[CalculateIndex(seconds)];
     }
+
     /// <summary>
-    /// Read specified value from circular buffer
+    ///     Read specified value from circular buffer
     /// </summary>
-    /// <param name="seconds">Variable defining how many seconds into the past should be read (eg. seconds=5 then function will return the values that tracked object had exactly 5 seconds ago)</param>
-    /// <param name="wasLastAccessedIndexSame">To save performance, for certain rewinds we can check if the last accessed index was the same current and choose to ignore the update</param>
+    /// <param name="seconds">
+    ///     Variable defining how many seconds into the past should be read (eg. seconds=5 then function will
+    ///     return the values that tracked object had exactly 5 seconds ago)
+    /// </param>
+    /// <param name="wasLastAccessedIndexSame">
+    ///     To save performance, for certain rewinds we can check if the last accessed index
+    ///     was the same current and choose to ignore the update
+    /// </param>
     /// <returns></returns>
     public T ReadFromBuffer(float seconds, out bool wasLastAccessedIndexSame)
     {
-        int index = CalculateIndex(seconds);
+        var index = CalculateIndex(seconds);
 
         wasLastAccessedIndexSame = index == lastAccessedIndex;
         lastAccessedIndex = index;
         return dataArray[index];
     }
+
     private void MoveLastBufferPosition(float seconds)
     {
-        bufferCurrentPosition= CalculateIndex(seconds);    
+        bufferCurrentPosition = CalculateIndex(seconds);
     }
+
     private int CalculateIndex(float seconds)
     {
-        int howManyBeforeLast = (int)(howManyRecordsPerSecond * (seconds - 0.001));
-        int moveBy = bufferCurrentPosition - howManyBeforeLast;
-       
-        if (moveBy < 0)
-        {
-            return bufferCapacity + moveBy;
-        }
-        else
-        {
-            return bufferCurrentPosition - howManyBeforeLast;
-        }
+        var howManyBeforeLast = (int)(howManyRecordsPerSecond * (seconds - 0.001));
+        var moveBy = bufferCurrentPosition - howManyBeforeLast;
+
+        if (moveBy < 0) return bufferCapacity + moveBy;
+
+        return bufferCurrentPosition - howManyBeforeLast;
     }
 }

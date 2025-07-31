@@ -6,9 +6,12 @@ Shader "Custom/ScrollingStripes"
         _Speed("Speed", float) = 1.0
         _OwnTime("Time",float) =1
     }
-        SubShader
+    SubShader
     {
-        Tags { "RenderType" = "Opaque" }
+        Tags
+        {
+            "RenderType" = "Opaque"
+        }
         LOD 100
 
         Pass
@@ -28,13 +31,14 @@ Shader "Custom/ScrollingStripes"
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
             };
+
             sampler2D _MainTex;
 
             CBUFFER_START(UnityPerMaterial)
-            float4 _MainTex_ST;
-            float4 _MainColor;
-            float _Speed;
-            float _OwnTime;
+                float4 _MainTex_ST;
+                float4 _MainColor;
+                float _Speed;
+                float _OwnTime;
             CBUFFER_END
 
             v2f vert(appdata v)
@@ -53,11 +57,9 @@ Shader "Custom/ScrollingStripes"
                 // Adjust the value so that the black stripe is half as thick as the colored stripe
                 float adjustedStripeValue = stripeValue < 0.5 ? 1.0 : 0.0;
 
-                half4 color = lerp(half4(0,0,0,1), _MainColor, adjustedStripeValue);
+                half4 color = lerp(half4(0, 0, 0, 1), _MainColor, adjustedStripeValue);
                 return color;
             }
-
-
             ENDCG
         }
     }

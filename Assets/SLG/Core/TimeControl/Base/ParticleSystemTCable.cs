@@ -1,6 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using TVA;
+using System;
 using UnityEngine;
 
 namespace TVA
@@ -18,17 +16,15 @@ namespace TVA
 
     public class ParticleSystemTCable : TCableBase<ParticleFrameData>
     {
-        ParticleSystem[] _particleSystems;
-        float[] _particleTimes;
+        private ParticleSystem[] _particleSystems;
+        private float[] _particleTimes;
+
         protected override void Start()
         {
             base.Start();
             _particleSystems = GetComponentsInChildren<ParticleSystem>(true);
             _particleTimes = new float[_particleSystems.Length];
-            for (int i = 0; i < _particleTimes.Length; i++)
-            {
-                _particleTimes[i] = 0f;
-            }
+            for (var i = 0; i < _particleTimes.Length; i++) _particleTimes[i] = 0f;
 
             SetDebug(true);
         }
@@ -41,12 +37,12 @@ namespace TVA
         protected override ParticleFrameData GetCurTrackData(float rate)
         {
             ParticleFrameData particleFrameData;
-            ParticleTrackedData[] particles = new ParticleTrackedData[_particleSystems.Length];
-            for (int i = 0; i < _particleSystems.Length; i++)
+            var particles = new ParticleTrackedData[_particleSystems.Length];
+            for (var i = 0; i < _particleSystems.Length; i++)
             {
                 particles[i].isPlaying = _particleSystems[i].isPlaying;
-                
-                if(_particleSystems[i].isPlaying)
+
+                if (_particleSystems[i].isPlaying)
                     _particleTimes[i] += Time.fixedDeltaTime;
                 particles[i].particleTime = _particleTimes[i];
             }
@@ -63,11 +59,12 @@ namespace TVA
                 Debug.LogError("RewindAction: Particle System count mismatch!");
                 return;
             }
-            for (int i = 0; i < _particleSystems.Length; i++)
+
+            for (var i = 0; i < _particleSystems.Length; i++)
             {
-                ParticleTrackedData particleTracked = curValue.particles[i];  
-                if(particleTracked.isPlaying)
-                 _particleSystems[i].Simulate(particleTracked.particleTime, false, true, false);          
+                var particleTracked = curValue.particles[i];
+                if (particleTracked.isPlaying)
+                    _particleSystems[i].Simulate(particleTracked.particleTime, false, true, false);
             }
         }
 
@@ -79,18 +76,19 @@ namespace TVA
                 Debug.LogError("RewindAction: Particle System count mismatch!");
                 return;
             }
-            for (int i = 0; i < _particleSystems.Length; i++)
+
+            for (var i = 0; i < _particleSystems.Length; i++)
             {
-                ParticleTrackedData particleTracked = rewindValue.particles[i];  
-                if(particleTracked.isPlaying)
+                var particleTracked = rewindValue.particles[i];
+                if (particleTracked.isPlaying)
                     _particleSystems[i].Play();
             }
         }
 
-       
+
         protected override void DestoryCompelety()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

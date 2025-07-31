@@ -1,16 +1,14 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ScaleChanger : MonoBehaviour
 {
-    [SerializeField] Text textToUpdate;
-    [SerializeField] Slider slider;
+    [SerializeField] private Text textToUpdate;
+    [SerializeField] private Slider slider;
 
-    public void OnSliderChange(Single value)
+    public void OnSliderChange(float value)
     {
         transform.localScale = new Vector3(value, value, value);
         textToUpdate.text = value.ToString("0.00");
     }
-
 }

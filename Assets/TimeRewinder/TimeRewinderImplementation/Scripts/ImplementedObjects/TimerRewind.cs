@@ -4,15 +4,17 @@ using UnityEngine;
 //This script is showing setup of defaulty implemented tracking solutions (eg. tracking particles, audio...) in combination with custom variable tracking.
 public class TimerRewind : RewindAbstract
 {
-    CircularBuffer<float> trackedTime;     //For storing data, use this CircularBuffer class
-    [SerializeField] ParticleTimer particleTimer;
-    
-    [SerializeField] ParticlesSetting particleSettings;
+    [SerializeField] private ParticleTimer particleTimer;
+
+    [SerializeField] private ParticlesSetting particleSettings;
+    private CircularBuffer<float> trackedTime; //For storing data, use this CircularBuffer class
 
     private void Start()
     {
-        trackedTime = new CircularBuffer<float>();  //Circular buffer must be initialized in start method, it cannot use field initialization
-        InitializeParticles(particleSettings);      //When choosing to track particles in custom tracking script, you need to first initialize these particles in start method
+        trackedTime =
+            new CircularBuffer<float>(); //Circular buffer must be initialized in start method, it cannot use field initialization
+        InitializeParticles(
+            particleSettings); //When choosing to track particles in custom tracking script, you need to first initialize these particles in start method
     }
 
 
@@ -45,7 +47,7 @@ public class TimerRewind : RewindAbstract
     // This is an example of custom variable restoring
     public void RestoreTimer(float seconds)
     {
-        float rewindValue= trackedTime.ReadFromBuffer(seconds);
+        var rewindValue = trackedTime.ReadFromBuffer(seconds);
         particleTimer.CurrentTimer = rewindValue;
         particleTimer.SetText(rewindValue);
     }

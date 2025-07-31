@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: e_Npc_lingjiugongyue_1_WuYingLingLuan_14
+  m_Shader: {fileID: 4800000, guid: f1196dff42005db47aba13b576bf6703, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _FlowMap:
+        m_Texture: {fileID: 2800000, guid: 3a92e548e87b04641b39991191ec599c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: d662bbaf669a2ed4f947fc14684f8f55, type: 3}
+        m_Scale: {x: 1, y: 2}
+        m_Offset: {x: 0, y: 0}
+    - _MaskMap:
+        m_Texture: {fileID: 2800000, guid: 2e4805ac13d9dec438148f61b0376713, type: 3}
+        m_Scale: {x: -1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AddColor: 0.6
+    - _FlowIntensity: 0.2
+    - _FlowSpeed: 0
+    - _MainUspeed: -0.8
+    - _MainVspeed: 0
+    - _MaskUspeed: 0
+    - _MaskVspeed: 0
+    - _MaxX: 10
+    - _MaxY: 10
+    - _MinX: -10
+    - _MinY: -10
+    - _RectClipToggle: 0
+    - _Strength: 0
+    - _Uspeed: 0.2
+    - _Vspeed: 0
+    - _WaveLength: 0
+    - _XAxis: 0
+    - _YAxis: 1
+    - _ZAxis: 0
+    m_Colors:
+    - _TintColor: {r: 19.162785, g: 9.989111, b: 2.1405237, a: 1}
+  m_BuildTextureStacks: []
