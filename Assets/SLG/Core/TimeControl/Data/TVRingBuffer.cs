@@ -25,13 +25,13 @@ namespace TVA
             _curPos++;
             if(_curPos >= _capacity)
                 _curPos = 0;
-            _buffer[_curPos] = value;
-            Debug.LogWarning("写 "+ _curPos);
+             _buffer[_curPos] = value;
+         //   Debug.LogWarning("写 "+ _curPos);
         }
 
         public T ReadValue(float seconds)
         {
-            Debug.LogWarning("读 "+ CalculateIndex(seconds) + " seconds: " + seconds + " _curPos: " + _curPos);
+          //  Debug.LogWarning("读 "+ CalculateIndex(seconds) + " seconds: " + seconds + " _curPos: " + _curPos);
             return _buffer[CalculateIndex(seconds)];
         }
 

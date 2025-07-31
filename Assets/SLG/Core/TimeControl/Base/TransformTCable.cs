@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+
 namespace TVA
 {
     public struct TransformValues
@@ -8,60 +9,40 @@ namespace TVA
         public Quaternion rotation;
         public Vector3 scale;
     }
+
     public class TransformTCable : TCableBase<TransformValues>
     {
         private Transform _transform;
-        protected override void Init(int second,int perSec)
+
+        protected override void Start()
         {
-            buffers = new TVRingBuffer<TransformValues>(second * perSec, perSec);
+            base.Start();
             _transform = transform;
         }
 
-        /*public override void OnEnable()
+        protected override void InitTCObj()
         {
-            throw new System.NotImplementedException();
+            Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime);
         }
-
-        public override void OnDisable()
-        {
-            throw new System.NotImplementedException();
-        }*/
-
-      
 
         protected override void DestoryCompelety()
         {
-           // throw new System.NotImplementedException();
-           buffers.Clear();
+            // throw new System.NotImplementedException();
         }
 
-        protected override void TrackAction(float rate)
+        protected override TransformValues GetCurTrackData(float rate)
         {
             TransformValues valuesToWrite;
             valuesToWrite.position = _transform.position;
             valuesToWrite.rotation = _transform.rotation;
             valuesToWrite.scale = _transform.localScale;
-            buffers.RecordValue(valuesToWrite);
+            return valuesToWrite;
         }
 
-        protected override void RewindAction(float seconds, float rate)
+        protected override void RewindAction(TransformValues valuesToRead)
         {
-            TransformValues valuesToRead = buffers.ReadValue(seconds);
             transform.SetPositionAndRotation(valuesToRead.position, valuesToRead.rotation);
-            transform.localScale= valuesToRead.scale;
-        }
-
-        private void Start()
-        {
-            Initialized(TCManager.Instance.TrackTime, (int)(1 / Time.fixedDeltaTime));
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.B))
-            {
-                TCManager.Instance.StartRewindTimeBySeconds(2);
-            }
+            transform.localScale = valuesToRead.scale;
         }
     }
 }

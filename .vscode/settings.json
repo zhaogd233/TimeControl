@@ -51,5 +51,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "UnityTimeRewinder-main.sln"
+    "dotnet.defaultSolution": "UnityTimeRewinder-main.sln",
+    "dotnet.preferCSharpExtension": true
 }

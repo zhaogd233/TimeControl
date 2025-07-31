@@ -8,14 +8,9 @@ namespace TVA
         [SerializeField] public int TrackTime;
 
         private List<ITCable> _TCables; // 时间可操控对象
-        
+
         float rewindSeconds = 0;
-        
-        /// <summary>
-        /// This property returns how many seconds are currently available for rewind
-        /// </summary>
-      //  public float HowManySecondsAvailableForRewind { get; private set; }
-        
+
         /// <summary>
         /// Singleton instance of RewindManager
         /// </summary>
@@ -31,11 +26,13 @@ namespace TVA
             _TCables = new List<ITCable>();
             Instance = this;
         }
+
+        #region 操控对象管理
+
         /// <summary>
-        /// Lets you add object to track pool even when game is already running.
+        /// 跟踪可被操控的对象
         /// </summary>
-        /// <param name="objectToRewind"></param>
-        /// <param name="automaticDestroy">When you rewind before this object is added for tracking, you can choose if object gets disabled or is detroyed when resuming the game.</param>
+        /// <param name="tcable"></param>
         public void AddObjectForTracking(ITCable tcable)
         {
             _TCables.Add(tcable);
@@ -45,66 +42,62 @@ namespace TVA
         {
             _TCables.Remove(tcable);
         }
-        
+
+        #endregion
+
         /// <summary>
-        /// Tells you if scene is currently being rewinded
+        /// 是否正在回溯
         /// </summary>
-        public bool IsBeingRewinded { get; private set; } = false;
-        
+        public bool bRewinding { get; private set; } = false;
+
+        /// <summary>
+        /// 准备结束回溯
+        /// </summary>
+        private bool _bPrepareFinishRewind = false;
+
         public void StartRewindTimeBySeconds(float seconds)
         {
-            if (IsBeingRewinded)
-                Debug.LogError("The previous rewind must be stopped by calling StopRewindTimeBySeconds() before you start another rewind");
-        
-            CheckReachingOutOfBounds(seconds);
+            if (bRewinding)
+                Debug.LogError(
+                    "The previous rewind must be stopped by calling StopRewindTimeBySeconds() before you start another rewind");
+
 
             rewindSeconds = seconds;
-            IsBeingRewinded = true;
+            bRewinding = true;
         }
+
         /// <summary>
         /// Call this method to update rewind preview while rewind is active (StartRewindTimeBySeconds() method was called before)
         /// </summary>
         /// <param name="seconds">Parameter defining how many seconds should the rewind preview move to (Parameter must be >=0)</param>
         public void SetTimeSecondsInRewind(float seconds)
         {
-            CheckReachingOutOfBounds(seconds);
             rewindSeconds = seconds;
         }
+
         public void StopRewindTimeBySeconds()
         {
-            if (!IsBeingRewinded)
-                Debug.LogError("Rewind must be started before you try to stop it. StartRewindTimeBySeconds() must be called first");
+            if (!bRewinding)
+                Debug.LogError(
+                    "Rewind must be started before you try to stop it. StartRewindTimeBySeconds() must be called first");
 
-            IsBeingRewinded = false;
+            _bPrepareFinishRewind = true;
         }
-        
-        private void CheckReachingOutOfBounds(float seconds)
+
+        private void FixedUpdate()
         {
-            /*if (Mathf.Round(seconds*100) > Mathf.Round(HowManySecondsAvailableForRewind*100))
+            if (_bPrepareFinishRewind)
             {
-                Debug.LogError("Not enough stored tracked value!!! Reaching on wrong index. Called rewind should be less than HowManySecondsAvailableForRewind property");
-                return;
-            }*/
-            if (seconds < 0)
-            {
-                Debug.LogError("Parameter in StartRewindTimeBySeconds() must have positive value!!!");
-                return;
+                _bPrepareFinishRewind = false;
+                bRewinding = false;
+
+                _TCables.ForEach(x => x.FinishRewind());
             }
+
+            if (bRewinding)
+                _TCables.ForEach(x => x.Rewind(rewindSeconds, 1f));
+            else
+                _TCables.ForEach(x => x.Forward(1f));
         }
-        
-         private  void FixedUpdate()
-            {   
-                if (IsBeingRewinded)
-                {
-                    _TCables.ForEach(x => x.Rewind(rewindSeconds,1f));
-                }
-                else 
-                {
-                    _TCables.ForEach(x => x.Forward(1f));
-                 
-                    //if(TrackingEnabled)
-                      //  HowManySecondsAvailableForRewind = Mathf.Min(HowManySecondsAvailableForRewind + Time.fixedDeltaTime, HowManySecondsToTrack);
-                }
-            }
     }
 }

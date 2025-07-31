@@ -17,10 +17,17 @@ namespace TVA
         /// <param name="seconds"></param>
         /// <param name="rate"></param>
         void Rewind(float seconds, float rate);
+        
+        /// <summary>
+        /// rewind 结束，之后就继续正播
+        /// </summary> <summary>
+        /// 
+        /// </summary>
+        void FinishRewind();
 
         #region 生命周期，对外暴漏的可调用接口
-        
-        void Initialized(int second, int perSec);
+
+        void Initialized(int maxSecond, float updateDelta);
 
         /*void OnEnable();
         void OnDisable();*/
