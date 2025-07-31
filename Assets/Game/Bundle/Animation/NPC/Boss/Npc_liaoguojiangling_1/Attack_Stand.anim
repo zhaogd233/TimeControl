@@ -7,7 +7,7 @@ AnimationClip:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Attack_Stand
-  serializedVersion: 6
+  serializedVersion: 7
   m_Legacy: 1
   m_Compressed: 0
   m_UseHighQualityCurve: 1
@@ -5435,7 +5435,7 @@ AnimationClip:
   m_FloatCurves: []
   m_PPtrCurves: []
   m_SampleRate: 30
-  m_WrapMode: 2
+  m_WrapMode: 1
   m_Bounds:
     m_Center: {x: -0.13995719, y: 0.7287307, z: 0.09944296}
     m_Extent: {x: 0.5891665, y: 0.7348068, z: 0.5372008}

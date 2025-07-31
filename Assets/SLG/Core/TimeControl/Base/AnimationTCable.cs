@@ -22,7 +22,7 @@ namespace TVA
         protected override void InitTCObj()
         {
             Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime);
-            SetDebug(true);
+          //  SetDebug(true);
         }
 
         protected override LegacyAnimationTrackedData GetCurTrackData(float rate)

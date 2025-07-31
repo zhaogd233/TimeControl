@@ -29,26 +29,29 @@
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/TransformTCable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Data/TVRingBuffer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Manager/TCManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/SLG/Test/NpcController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/SLG/Test/NpcSpawnerLegacy.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/TimeRewinder/ExampleScene/ScriptsForScene/GunBarell.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/TimeRewinder/TimeRewinderImplementation/Scripts/CircularBuffer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/TimeRewinder/TimeRewinderImplementation/Scripts/RewindAbstract.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/TimeRewinder/TimeRewinderImplementation/Scripts/RewindInputs/RewindBySlider.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/TimeRewinder/TimeRewinderImplementation/Scripts/RewindInputs/TCBySlider.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/TimeRewinder/TimeRewinderImplementation/Scripts/RewindManager.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="30aMBwKN6Sw5YItldO28OnIdLxB" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "附加到 Unity 编辑器.附加到 Unity 编辑器.executor": "Debug"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;附加到 Unity 编辑器.附加到 Unity 编辑器.executor&quot;: &quot;Debug&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="附加到 Unity 编辑器.附加到 Unity 编辑器">
     <configuration name="启动 Unity" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="F:\Program Files\Unity 2022.3.37f1\Editor\Unity.exe" />
@@ -66,6 +69,21 @@
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <method v="2" />
     </configuration>
+    <configuration name="附加到 Unity 编辑器" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="45460">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="listenPortForConnections" value="false" />
+      <option name="pid" value="45460" />
+      <option name="projectPathOnTarget" />
+      <option name="runtimes">
+        <list>
+          <MonoRuntime />
+        </list>
+      </option>
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <method v="2" />
+    </configuration>
     <configuration name="附加到 Unity 编辑器并运行" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
@@ -73,21 +91,6 @@
       <option name="projectPathOnTarget" />
       <option name="runtimes">
         <list />
-      </option>
-      <option name="selectedOptions">
-        <list />
-      </option>
-      <method v="2" />
-    </configuration>
-    <configuration name="附加到 Unity 编辑器" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="21448">
-      <option name="allowRunningInParallel" value="false" />
-      <option name="listenPortForConnections" value="false" />
-      <option name="pid" value="21448" />
-      <option name="projectPathOnTarget" />
-      <option name="runtimes">
-        <list>
-          <MonoRuntime />
-        </list>
       </option>
       <option name="selectedOptions">
         <list />
@@ -103,7 +106,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1753861099966</updated>
-      <workItem from="1753861101827" duration="33292000" />
+      <workItem from="1753861101827" duration="42350000" />
+      <workItem from="1753959192505" duration="3545000" />
     </task>
     <servers />
   </component>
@@ -122,68 +126,55 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/ParticleSystemTCable.cs</url>
-          <line>85</line>
-          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Core\TimeControl\Base\ParticleSystemTCable.cs" containingFunctionPresentation="方法 'FinishRewindAction'">
+          <line>42</line>
+          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Core\TimeControl\Base\ParticleSystemTCable.cs" containingFunctionPresentation="方法 'GetCurTrackData'">
             <startOffsets>
-              <option value="2985" />
+              <option value="1108" />
             </startOffsets>
             <endOffsets>
-              <option value="3012" />
+              <option value="1144" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/ParticleSystemTCable.cs</url>
-          <line>75</line>
-          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Core\TimeControl\Base\ParticleSystemTCable.cs" containingFunctionPresentation="方法 'FinishRewindAction'">
-            <startOffsets>
-              <option value="2486" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2627" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="8" />
+          <option name="timeStamp" value="18" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/AnimationTCable.cs</url>
           <line>45</line>
           <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Core\TimeControl\Base\AnimationTCable.cs" containingFunctionPresentation="方法 'RewindAction'">
             <startOffsets>
-              <option value="1292" />
+              <option value="1214" />
             </startOffsets>
             <endOffsets>
-              <option value="1304" />
+              <option value="1226" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="9" />
+          <option name="timeStamp" value="24" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/AnimationTCable.cs</url>
-          <line>35</line>
-          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Core\TimeControl\Base\AnimationTCable.cs" containingFunctionPresentation="方法 'GetCurTrackData'">
+          <url>file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/TransformTCable.cs</url>
+          <line>47</line>
+          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Core\TimeControl\Base\TransformTCable.cs" containingFunctionPresentation="方法 'RewindAction'">
             <startOffsets>
-              <option value="1047" />
+              <option value="1226" />
             </startOffsets>
             <endOffsets>
-              <option value="1070" />
+              <option value="1305" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="10" />
+          <option name="timeStamp" value="25" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/AnimationTCable.cs</url>
-          <line>30</line>
-          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Core\TimeControl\Base\AnimationTCable.cs" containingFunctionPresentation="方法 'GetCurTrackData'">
+          <url>file://$PROJECT_DIR$/Assets/TimeRewinder/TimeRewinderImplementation/Scripts/RewindInputs/TCBySlider.cs</url>
+          <line>81</line>
+          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\TimeRewinder\TimeRewinderImplementation\Scripts\RewindInputs\TCBySlider.cs" containingFunctionPresentation="方法 'OnSliderUpdate'">
             <startOffsets>
-              <option value="873" />
+              <option value="2094" />
             </startOffsets>
             <endOffsets>
-              <option value="911" />
+              <option value="2280" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="11" />
+          <option name="timeStamp" value="26" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -24,9 +24,13 @@ namespace TVA
             base.Start();
             _particleSystems = GetComponentsInChildren<ParticleSystem>(true);
             _particleTimes = new float[_particleSystems.Length];
-            for (var i = 0; i < _particleTimes.Length; i++) _particleTimes[i] = 0f;
+        //    SetDebug(true);
+        }
 
-            SetDebug(true);
+        private void OnEnable()
+        {
+            if (_particleSystems != null)
+             for (var i = 0; i < _particleTimes.Length; i++) _particleTimes[i] = 0f;
         }
 
         protected override void InitTCObj()
@@ -44,7 +48,7 @@ namespace TVA
 
                 if (_particleSystems[i].isPlaying)
                     _particleTimes[i] += Time.fixedDeltaTime;
-                particles[i].particleTime = _particleTimes[i];
+                particles[i].particleTime = _particleTimes[i] % _particleSystems[i].main.duration;
             }
 
             particleFrameData.particles = particles;

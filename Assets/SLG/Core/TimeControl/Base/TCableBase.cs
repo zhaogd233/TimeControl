@@ -4,6 +4,7 @@ namespace TVA
 {
     public abstract class TCableBase<T> : MonoBehaviour, ITCable
     {
+        public bool bRewinding { private set; get; } = false;
         private float _lastRewindSeconds;
         private TVRingBuffer<T> _recordbuffer;
 
@@ -33,6 +34,7 @@ namespace TVA
         public void Rewind(float seconds, float rate)
         {
             _lastRewindSeconds = seconds;
+            bRewinding = true;
 
             //TODO 判断是否超边界，取边界值
             if (TryGetRecordValue(seconds, out var valuesToRead))
@@ -44,6 +46,7 @@ namespace TVA
 
         public void FinishRewind()
         {
+            bRewinding = false;
             if (_recordbuffer == null)
             {
                 Debug.LogError("尚未调用Initialized");
