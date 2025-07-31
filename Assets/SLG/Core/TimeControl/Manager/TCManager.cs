@@ -14,7 +14,7 @@ namespace TVA
         /// <summary>
         /// This property returns how many seconds are currently available for rewind
         /// </summary>
-        public float HowManySecondsAvailableForRewind { get; private set; }
+      //  public float HowManySecondsAvailableForRewind { get; private set; }
         
         /// <summary>
         /// Singleton instance of RewindManager
@@ -28,6 +28,7 @@ namespace TVA
                 Destroy(Instance);
             }
 
+            _TCables = new List<ITCable>();
             Instance = this;
         }
         /// <summary>
@@ -60,23 +61,30 @@ namespace TVA
             rewindSeconds = seconds;
             IsBeingRewinded = true;
         }
-        
+        /// <summary>
+        /// Call this method to update rewind preview while rewind is active (StartRewindTimeBySeconds() method was called before)
+        /// </summary>
+        /// <param name="seconds">Parameter defining how many seconds should the rewind preview move to (Parameter must be >=0)</param>
+        public void SetTimeSecondsInRewind(float seconds)
+        {
+            CheckReachingOutOfBounds(seconds);
+            rewindSeconds = seconds;
+        }
         public void StopRewindTimeBySeconds()
         {
             if (!IsBeingRewinded)
                 Debug.LogError("Rewind must be started before you try to stop it. StartRewindTimeBySeconds() must be called first");
 
-            HowManySecondsAvailableForRewind -= rewindSeconds;
             IsBeingRewinded = false;
         }
         
         private void CheckReachingOutOfBounds(float seconds)
         {
-            if (Mathf.Round(seconds*100) > Mathf.Round(HowManySecondsAvailableForRewind*100))
+            /*if (Mathf.Round(seconds*100) > Mathf.Round(HowManySecondsAvailableForRewind*100))
             {
                 Debug.LogError("Not enough stored tracked value!!! Reaching on wrong index. Called rewind should be less than HowManySecondsAvailableForRewind property");
                 return;
-            }
+            }*/
             if (seconds < 0)
             {
                 Debug.LogError("Parameter in StartRewindTimeBySeconds() must have positive value!!!");

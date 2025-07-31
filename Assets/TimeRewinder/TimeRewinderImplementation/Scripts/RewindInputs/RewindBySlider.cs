@@ -1,4 +1,5 @@
 using System.Collections;
+using TVA;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -105,7 +106,8 @@ public class RewindBySlider : MonoBehaviour,IPointerDownHandler, IPointerUpHandl
         {
             if (!isRewindPaused)
             {
-                RewindManager.Instance.StopRewindTimeBySeconds();                    //After rewind is done, correctly stop it
+                RewindManager.Instance.StopRewindTimeBySeconds();
+                TCManager.Instance.StopRewindTimeBySeconds();                 //After rewind is done, correctly stop it
                 RestoreSliderAnimation();
 
                 if(RewindManager.Instance.TrackingEnabled)
@@ -120,11 +122,13 @@ public class RewindBySlider : MonoBehaviour,IPointerDownHandler, IPointerUpHandl
     {
         if (slider.interactable)
         {
-            if(!isRewindPaused)
-                RewindManager.Instance.StartRewindTimeBySeconds(-slider.value*RewindManager.Instance.HowManySecondsToTrack);       //Start rewind preview (note that slider have negative values, that is why it is passed with minus sign)                                               
-            
+            if (!isRewindPaused)
+                RewindManager.Instance.StartRewindTimeBySeconds(-slider.value * RewindManager.Instance.HowManySecondsToTrack);       //Start rewind preview (note that slider have negative values, that is why it is passed with minus sign)                                               
+
             SliderAnimationPause();
             rewindSound.Play();
+            
+            TCManager.Instance.StartRewindTimeBySeconds(-slider.value * RewindManager.Instance.HowManySecondsToTrack); //Start rewind in TCManager
         }
     }
     private void SetNormalSpeed()
@@ -133,6 +137,8 @@ public class RewindBySlider : MonoBehaviour,IPointerDownHandler, IPointerUpHandl
     }
     public void OnSliderUpdate(float value)
     {
+        
+        TCManager.Instance.SetTimeSecondsInRewind(-value * RewindManager.Instance.HowManySecondsToTrack);     //If slider value changes, change rewind preview state (note that slider have negative values, that is why it is passed with minus sign) 
         RewindManager.Instance.SetTimeSecondsInRewind(-value * RewindManager.Instance.HowManySecondsToTrack);     //If slider value changes, change rewind preview state (note that slider have negative values, that is why it is passed with minus sign) 
     }
     public void SliderAnimationPause()                                  //When rewinding slider animator is paused

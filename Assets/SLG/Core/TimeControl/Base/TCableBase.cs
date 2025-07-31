@@ -30,7 +30,7 @@ namespace TVA
             RewindAction(seconds, rate);
             
             //更新写入位置，之后的数据重新写入
-            buffers.MoveLastBufferPos(seconds);
+        //    buffers.MoveLastBufferPos(seconds);
         }
 
         /// <summary>

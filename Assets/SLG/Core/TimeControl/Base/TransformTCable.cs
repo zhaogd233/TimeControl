@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 namespace TVA
 {
@@ -48,6 +49,19 @@ namespace TVA
             TransformValues valuesToRead = buffers.ReadValue(seconds);
             transform.SetPositionAndRotation(valuesToRead.position, valuesToRead.rotation);
             transform.localScale= valuesToRead.scale;
+        }
+
+        private void Start()
+        {
+            Initialized(TCManager.Instance.TrackTime, (int)(1 / Time.fixedDeltaTime));
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                TCManager.Instance.StartRewindTimeBySeconds(2);
+            }
         }
     }
 }
