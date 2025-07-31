@@ -12,6 +12,7 @@ namespace TVA
         private int _curPos = -1;
         int _capacity;
         int _countPerSec;
+        private bool _bDebug;
 
         public TVRingBuffer(int capacity, int countPerSec)
         {
@@ -26,12 +27,15 @@ namespace TVA
             if(_curPos >= _capacity)
                 _curPos = 0;
              _buffer[_curPos] = value;
-         //   Debug.LogWarning("写 "+ _curPos);
+             
+             if(_bDebug)
+              Debug.LogWarning("写 "+ _curPos);
         }
 
         public T ReadValue(float seconds)
         {
-          //  Debug.LogWarning("读 "+ CalculateIndex(seconds) + " seconds: " + seconds + " _curPos: " + _curPos);
+            if(_bDebug)
+             Debug.LogWarning("读 "+ CalculateIndex(seconds) + " seconds: " + seconds + " _curPos: " + _curPos);
             return _buffer[CalculateIndex(seconds)];
         }
 
@@ -57,6 +61,11 @@ namespace TVA
         public void Clear()
         {
             _buffer = null;
+        }
+
+        public void SetDebug(bool b)
+        {
+            _bDebug = b;
         }
 
     }

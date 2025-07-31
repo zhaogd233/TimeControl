@@ -19,6 +19,11 @@ public class ActiveStateTCable : TCableBase<bool>
             gameObject.SetActive(curValue);
     }
 
+    protected override void FinishRewindAction(bool rewindValue)
+    {
+    }
+
+
     protected override void DestoryCompelety()
     {
     }

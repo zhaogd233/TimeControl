@@ -49,6 +49,9 @@ namespace TVA
                 return;
             }
             //回溯结束，之后就继续正播
+            if (TryGetRecordValue(_lastRewindSeconds, out T valuesToRead))
+              FinishRewindAction(valuesToRead);
+            
             _recordbuffer.MoveLastBufferPos(_lastRewindSeconds);
             _lastRewindSeconds = 0;
         }
@@ -108,8 +111,11 @@ namespace TVA
 
         public void _DestoryCompelety()
         {
-            if(_recordbuffer == null)
+            if (_recordbuffer == null)
+            {
                 Debug.LogError("尚未调用Initialized");
+                return;
+            }
             _recordbuffer.Clear();
             TCManager.Instance.RemoveObjectForTracking(this);
             DestoryCompelety();
@@ -120,12 +126,39 @@ namespace TVA
             InitTCObj();
         }
 
+        public void SetDebug(bool b)
+        {
+            if (_recordbuffer == null)
+            {
+                Debug.LogError("尚未调用Initialized");
+                return;
+            }
+            _recordbuffer.SetDebug(b);
+        }
+
         #region 子类需要去实现的具体逻辑
 
         protected abstract void InitTCObj();
 
+        /// <summary>
+        /// 获取当前正播记录信息
+        /// </summary>
+        /// <param name="rate"></param>
+        /// <returns></returns>
         protected abstract T GetCurTrackData(float rate);
+        
+        /// <summary>
+        /// 根据记录数据回溯当前行为
+        /// </summary>
+        /// <param name="curValue"></param>
         protected abstract void RewindAction(T curValue);
+        
+        
+        /// <summary>
+        /// 当回溯结束时刻的一些重置行为
+        /// </summary>
+        /// <param name="rewindSeconds"></param>
+        protected abstract void FinishRewindAction(T rewindValue);
         protected abstract void DestoryCompelety();
 
         #endregion

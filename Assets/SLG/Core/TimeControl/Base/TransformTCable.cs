@@ -25,6 +25,11 @@ namespace TVA
             Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime);
         }
 
+
+        protected override void FinishRewindAction(TransformValues rewindValue)
+        {
+        }
+
         protected override void DestoryCompelety()
         {
             // throw new System.NotImplementedException();

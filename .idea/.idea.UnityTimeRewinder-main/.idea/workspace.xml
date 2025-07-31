@@ -15,12 +15,14 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2d8783c7af0442318483a199a473c55b175e00/33/702a1c4f/Time.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2d8783c7af0442318483a199a473c55b175e00/50/eaa2a73f/Behaviour.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/18/ac07fc05/Tuple`2.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/36/22b579c3/Action`1.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a14ba41591b145589fb99270dfefc5711528c0/9e/2368f59e/Behaviour.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a14ba41591b145589fb99270dfefc5711528c0/9e/2368f59e/Behaviour.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b9d7da0ac6a14b08874de0cbbe6fdde726400/b1/c59c2edb/ParticleSystem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c0b7b90d34a54066a7234dad6925511646ac00/56/0915ae57/List`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/ITCable.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/ParticleSystemTCable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/TransformTCable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Data/TVRingBuffer.cs" root0="FORCE_HIGHLIGHTING" />
@@ -99,7 +101,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1753861099966</updated>
-      <workItem from="1753861101827" duration="19453000" />
+      <workItem from="1753861101827" duration="30019000" />
     </task>
     <servers />
   </component>
@@ -117,30 +119,30 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/TransformTCable.cs</url>
-          <line>62</line>
-          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Core\TimeControl\Base\TransformTCable.cs" containingFunctionPresentation="方法 'Update'">
+          <url>file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/ParticleSystemTCable.cs</url>
+          <line>85</line>
+          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Core\TimeControl\Base\ParticleSystemTCable.cs" containingFunctionPresentation="方法 'FinishRewindAction'">
             <startOffsets>
-              <option value="1808" />
+              <option value="2985" />
             </startOffsets>
             <endOffsets>
-              <option value="1855" />
+              <option value="3012" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="2" />
+          <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Manager/TCManager.cs</url>
-          <line>88</line>
-          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Core\TimeControl\Manager\TCManager.cs" containingFunctionPresentation="方法 'FixedUpdate'">
+          <url>file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/ParticleSystemTCable.cs</url>
+          <line>75</line>
+          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Core\TimeControl\Base\ParticleSystemTCable.cs" containingFunctionPresentation="方法 'FinishRewindAction'">
             <startOffsets>
-              <option value="3002" />
+              <option value="2486" />
             </startOffsets>
             <endOffsets>
-              <option value="3022" />
+              <option value="2627" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="3" />
+          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
