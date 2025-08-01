@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class ActiveStateTCable : TCableBase<bool>
 {
+    public GameObject target;
     protected override void InitTCObj()
     {
         Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime);
@@ -10,13 +11,13 @@ public class ActiveStateTCable : TCableBase<bool>
 
     protected override bool GetCurTrackData(float rate)
     {
-        return gameObject.activeInHierarchy;
+        return target.activeInHierarchy;
     }
 
     protected override void RewindAction(bool curValue)
     {
-        if (gameObject.activeInHierarchy != curValue)
-            gameObject.SetActive(curValue);
+        if (target.activeInHierarchy != curValue)
+            target.SetActive(curValue);
     }
 
     protected override void FinishRewindAction(bool rewindValue)

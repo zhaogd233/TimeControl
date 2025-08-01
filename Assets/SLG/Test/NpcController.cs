@@ -3,7 +3,7 @@ using TVA;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class NpcController : MonoBehaviour
+public class NpcController : MonoBehaviour,IAreaEntityListener
 {
     [Header("Animation 组件")] public Animation anim;
 
@@ -80,14 +80,6 @@ public class NpcController : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-        foreach (AnimationState state in anim)
-            if (state.enabled)
-            {
-                // Debug.Log(anim[state.name].name +" "+ anim[state.name].time);
-            }
-    }
 
     private void OnBeginRewindAnimation()
     {
@@ -159,4 +151,58 @@ public class NpcController : MonoBehaviour
         yield return new WaitForSeconds(delay);
         PlayRandomAnimation();
     }
+
+    #region 受到操控区域的作用
+
+    private ITCable[] _TCables = null;
+    private bool bRewinding,_bPrepareFinishRewind,bInArea;
+    private float offsetRewindSec = 0f;
+    public void OnEnterTCArea(float rate)
+    {
+        _TCables = GetComponentsInChildren<ITCable>();
+        bRewinding = true;
+        bInArea = true;
+        _bPrepareFinishRewind = false;
+        offsetRewindSec = 0f;
+    }
+
+    public void OnStayInTCArea(float deltaTime)
+    {
+        offsetRewindSec+=deltaTime;
+    }
+
+    public void OnExitTCArea()
+    {
+        _bPrepareFinishRewind = true;
+    }
+    
+    private void FixedUpdate()
+    {
+        if (!bInArea || _TCables == null) return;
+        
+        if (_bPrepareFinishRewind)
+        {
+            _bPrepareFinishRewind = false;
+            bRewinding = false;
+            bInArea = false;
+
+            foreach (ITCable tCable in _TCables)
+            {
+                tCable.FinishRewind();
+            }
+        }
+
+        if (bRewinding)
+            foreach (ITCable tCable in _TCables)
+            {
+                tCable.RewindOffset(offsetRewindSec, 1f);
+               // Debug.Log(offsetRewindSec);
+            }
+        else
+            foreach (ITCable tCable in _TCables)
+            {
+                tCable.Forward(Time.deltaTime, 1f);
+            }
+    }
+    #endregion
 }

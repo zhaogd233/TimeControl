@@ -45,7 +45,7 @@ namespace TVA
             var particles = new ParticleTrackedData[_particleSystems.Length];
             for (var i = 0; i < _particleSystems.Length; i++)
             {
-                particles[i].isPlaying = _particleSystems[i].isPlaying;
+                particles[i].isPlaying = _particleSystems[i].isPlaying && _particleSystems[i].gameObject.activeInHierarchy;
 
                 if (_particleSystems[i].isPlaying)
                     _particleTimes[i] += Time.fixedDeltaTime;

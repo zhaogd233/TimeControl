@@ -5,8 +5,9 @@ namespace TVA
 {
     public abstract class TCableBase<T> : MonoBehaviour, ITCable
     {
-        private float _lastRewindSeconds;
+        private float _lastRewindSeconds,_escapeTime;
         private TVRingBuffer<T> _recordbuffer;
+        public bool bDebug = false;
 
         /// <summary>
         ///     回溯结束，通知逻辑层继续更新逻辑，当前记录的最后行为会继续进行，之后逻辑更新
@@ -23,14 +24,19 @@ namespace TVA
         protected virtual void Start()
         {
             InitTCObj();
+            SetDebug(bDebug);
         }
 
         /// <summary>
         ///     正播&加速
         ///     只有从没有的数据开始播，才算记录，旧的加速还是回溯。
         /// </summary>
-        public void Forward(float rate)
+        public void Forward(float delaTime,float rate)
         {
+            if (bRewinding)
+                return;
+            
+            _escapeTime+= delaTime;
             var value = GetCurTrackData(rate);
             RecordValue(value);
             //判断是否超过已经最大记录，如果
@@ -45,6 +51,11 @@ namespace TVA
         /// <param name="rate"></param>
         public void Rewind(float seconds, float rate)
         {
+            if (seconds < 0 || seconds > _escapeTime)
+            {
+                Debug.LogError("越界" + seconds);
+                return;
+            }
             _lastRewindSeconds = seconds;
 
             if (!bRewinding && StartRewindEvent != null)
@@ -63,6 +74,12 @@ namespace TVA
 
             //更新写入位置，之后的数据重新写入
             //    buffers.MoveLastBufferPos(seconds);
+        }
+
+        public void RewindOffset(float seconds, float rate)
+        {
+          //  float targetSec = _escapeTime - seconds;
+            Rewind(seconds,rate);
         }
 
         public void FinishRewind()
@@ -84,6 +101,7 @@ namespace TVA
             }
 
             _recordbuffer.MoveLastBufferPos(_lastRewindSeconds);
+            _escapeTime = _lastRewindSeconds;
             _lastRewindSeconds = 0;
         }
 

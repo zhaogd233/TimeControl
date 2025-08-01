@@ -47,7 +47,7 @@ namespace TVA
             if (bRewinding)
                 _TCables.ForEach(x => x.Rewind(rewindSeconds, 1f));
             else
-                _TCables.ForEach(x => x.Forward(1f));
+                _TCables.ForEach(x => x.Forward(Time.fixedDeltaTime, 1f));
         }
 
         public void StartRewindTimeBySeconds(float seconds)
