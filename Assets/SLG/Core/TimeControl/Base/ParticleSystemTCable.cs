@@ -24,13 +24,14 @@ namespace TVA
             base.Start();
             _particleSystems = GetComponentsInChildren<ParticleSystem>(true);
             _particleTimes = new float[_particleSystems.Length];
-        //    SetDebug(true);
+            //    SetDebug(true);
         }
 
         private void OnEnable()
         {
             if (_particleSystems != null)
-             for (var i = 0; i < _particleTimes.Length; i++) _particleTimes[i] = 0f;
+                for (var i = 0; i < _particleTimes.Length; i++)
+                    _particleTimes[i] = 0f;
         }
 
         protected override void InitTCObj()

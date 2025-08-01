@@ -5,8 +5,8 @@ public class ParticleTimer : MonoBehaviour
 {
     [SerializeField] private Text timeText;
     [SerializeField] private GameObject particles;
-    private RewindManager rewindManager;
     private readonly float timerDefault = 5;
+    private RewindManager rewindManager;
     public float CurrentTimer { get; set; }
 
     private void Start()

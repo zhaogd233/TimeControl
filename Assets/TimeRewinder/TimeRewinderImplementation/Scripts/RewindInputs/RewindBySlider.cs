@@ -92,10 +92,11 @@ public class RewindBySlider : MonoBehaviour, IPointerDownHandler, IPointerUpHand
         TCManager.Instance.SetTimeSecondsInRewind(-value *
                                                   RewindManager.Instance
                                                       .HowManySecondsToTrack); //If slider value changes, change rewind preview state (note that slider have negative values, that is why it is passed with minus sign) 
-     /*   RewindManager.Instance.SetTimeSecondsInRewind(-value *
-                                                      RewindManager.Instance
-                                                          .HowManySecondsToTrack); //If slider value changes, change rewind preview state (note that slider have negative values, that is why it is passed with minus sign) 
-  */  }
+        /*   RewindManager.Instance.SetTimeSecondsInRewind(-value *
+                                                         RewindManager.Instance
+                                                             .HowManySecondsToTrack); //If slider value changes, change rewind preview state (note that slider have negative values, that is why it is passed with minus sign)
+     */
+    }
 
     public void SliderAnimationPause() //When rewinding slider animator is paused
     {

@@ -1,12 +1,24 @@
+using System;
 using UnityEngine;
 
 namespace TVA
 {
     public abstract class TCableBase<T> : MonoBehaviour, ITCable
     {
-        public bool bRewinding { private set; get; } = false;
         private float _lastRewindSeconds;
         private TVRingBuffer<T> _recordbuffer;
+
+        /// <summary>
+        ///     回溯结束，通知逻辑层继续更新逻辑，当前记录的最后行为会继续进行，之后逻辑更新
+        /// </summary>
+        public Action<T, float> FinishRewindEvent;
+
+        /// <summary>
+        ///     通知上层逻辑层开始回溯，逻辑内的更新暂停
+        /// </summary>
+        public Action StartRewindEvent;
+
+        public bool bRewinding { private set; get; }
 
         protected virtual void Start()
         {
@@ -34,7 +46,16 @@ namespace TVA
         public void Rewind(float seconds, float rate)
         {
             _lastRewindSeconds = seconds;
-            bRewinding = true;
+
+            if (!bRewinding && StartRewindEvent != null)
+            {
+                bRewinding = true;
+                StartRewindEvent();
+            }
+            else
+            {
+                bRewinding = true;
+            }
 
             //TODO 判断是否超边界，取边界值
             if (TryGetRecordValue(seconds, out var valuesToRead))
@@ -53,9 +74,14 @@ namespace TVA
                 return;
             }
 
-            //回溯结束，之后就继续正播
+            //回溯结束，通知上层逻辑继续执行逻辑运算
             if (TryGetRecordValue(_lastRewindSeconds, out var valuesToRead))
+            {
                 FinishRewindAction(valuesToRead);
+
+                if (FinishRewindEvent != null)
+                    FinishRewindEvent(valuesToRead, _lastRewindSeconds);
+            }
 
             _recordbuffer.MoveLastBufferPos(_lastRewindSeconds);
             _lastRewindSeconds = 0;
@@ -158,7 +184,7 @@ namespace TVA
 
 
         /// <summary>
-        ///     当回溯结束时刻的一些重置行为
+        ///     当回溯结束时刻,根据当前记录继续正播记录剩余的行为
         /// </summary>
         /// <param name="rewindSeconds"></param>
         protected abstract void FinishRewindAction(T rewindValue);

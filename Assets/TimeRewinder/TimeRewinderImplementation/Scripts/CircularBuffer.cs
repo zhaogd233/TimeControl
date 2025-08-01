@@ -3,9 +3,9 @@
 public class CircularBuffer<T>
 {
     private readonly int bufferCapacity;
-    private int bufferCurrentPosition = -1;
     private readonly T[] dataArray;
     private readonly float howManyRecordsPerSecond;
+    private int bufferCurrentPosition = -1;
     private int lastAccessedIndex = -1;
 
 

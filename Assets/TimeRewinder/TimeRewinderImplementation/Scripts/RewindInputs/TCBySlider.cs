@@ -28,7 +28,7 @@ public class TCBySlider : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         sliderAnimator = slider.GetComponent<Animator>();
         SetNormalSpeed();
     }
-  
+
 
     public void OnPointerDown(PointerEventData eventData)
     {
@@ -49,15 +49,12 @@ public class TCBySlider : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void OnSliderUp()
     {
         if (slider.interactable)
-        {
             if (!isRewindPaused)
             {
                 TCManager.Instance.StopRewindTimeBySeconds(); //After rewind is done, correctly stop it
                 RestoreSliderAnimation();
                 SetNormalSpeed();
             }
-
-        }
     }
 
     public void OnSliderDown()
@@ -65,10 +62,10 @@ public class TCBySlider : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (slider.interactable)
         {
             SliderAnimationPause();
-            if(TCManager.Instance != null)
-            TCManager.Instance.StartRewindTimeBySeconds(-slider.value *
-                                                        TCManager.Instance
-                                                            .TrackTime); //Start rewind in TCManager
+            if (TCManager.Instance != null)
+                TCManager.Instance.StartRewindTimeBySeconds(-slider.value *
+                                                            TCManager.Instance
+                                                                .TrackTime); //Start rewind in TCManager
         }
     }
 
@@ -88,6 +85,7 @@ public class TCBySlider : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         sliderAnimator.speed = 0;
     }
+
     public void RestoreSliderAnimation() //Slider restoration after user releases it, it will snap back to correct value
     {
         var animationTimeStartFrom = slider.value - slider.minValue;
@@ -121,14 +119,12 @@ public class TCBySlider : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void PauseTracking()
     {
-
         pauseTracking.interactable = false;
         resumeTracking.interactable = true;
     }
 
     public void ResumeTracking()
     {
-
         if (!isRewindPaused)
             SetNormalSpeed();
 
@@ -149,7 +145,7 @@ public class TCBySlider : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         RestoreSliderAnimation();
 
-            SetNormalSpeed();
+        SetNormalSpeed();
 
         rewindResume.interactable = false;
         rewindPause.interactable = true;

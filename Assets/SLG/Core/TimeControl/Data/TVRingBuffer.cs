@@ -8,10 +8,10 @@ namespace TVA
     /// <typeparam name="T"></typeparam>
     public class TVRingBuffer<T>
     {
-        private bool _bDebug;
-        private T[] _buffer;
         private readonly int _capacity;
         private readonly int _countPerSec;
+        private bool _bDebug;
+        private T[] _buffer;
         private int _curPos = -1;
 
         public TVRingBuffer(int capacity, int countPerSec)
