@@ -786,6 +786,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   normalColor: {r: 0, g: 1, b: 0.20245147, a: 1}
   overlapColor: {r: 1, g: 0, b: 0, a: 1}
+  direct: 0
   npcLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -1334,7 +1335,7 @@ MonoBehaviour:
   ballPrefab: {fileID: 607235107}
   worldCamera: {fileID: 963194227}
   ballLifeTime: 5
-  rate: 1
+  rate: 2
 --- !u!1 &1266009800
 GameObject:
   m_ObjectHideFlags: 0
@@ -1540,6 +1541,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   normalColor: {r: 0.4173813, g: 0, b: 1, a: 1}
   overlapColor: {r: 1, g: 0, b: 0, a: 1}
+  direct: 1
   npcLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -1810,6 +1812,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bDebug: 0
+  TCDirect: 0
 --- !u!114 &4074200075508992423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1823,6 +1826,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bDebug: 0
+  TCDirect: 0
 --- !u!136 &4074200075508992425
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1859,6 +1863,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bDebug: 0
+  TCDirect: 0
   target: {fileID: 708519431}
 --- !u!1001 &6303442898921414860
 PrefabInstance:

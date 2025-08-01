@@ -26,6 +26,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a269079ccdc14d98902cc431fc41467427800/bb/d455d17b/AnimationState.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b9d7da0ac6a14b08874de0cbbe6fdde726400/b1/c59c2edb/ParticleSystem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c0b7b90d34a54066a7234dad6925511646ac00/56/0915ae57/List`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c7c40cbd43ca4fb8b6951e7d929b375226ec0/11/f686b8c4/ParticleSystem.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/ITCable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/ParticleSystemTCable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="FORCE_HIGHLIGHTING" />
@@ -111,7 +112,7 @@
       <option name="presentableId" value="Default" />
       <updated>1753861099966</updated>
       <workItem from="1753861101827" duration="42350000" />
-      <workItem from="1753959192505" duration="20478000" />
+      <workItem from="1753959192505" duration="27740000" />
     </task>
     <servers />
   </component>
@@ -156,39 +157,39 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/SLG/Test/boll.cs</url>
-          <line>117</line>
+          <line>119</line>
           <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Test\boll.cs" containingFunctionPresentation="方法 'BeginTimeControl'">
             <startOffsets>
-              <option value="3353" />
+              <option value="3388" />
             </startOffsets>
             <endOffsets>
-              <option value="3383" />
+              <option value="3418" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="33" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/SLG/Test/boll.cs</url>
-          <line>133</line>
+          <line>135</line>
           <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Test\boll.cs" containingFunctionPresentation="方法 'Update'">
             <startOffsets>
-              <option value="3714" />
+              <option value="3756" />
             </startOffsets>
             <endOffsets>
-              <option value="3727" />
+              <option value="3769" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/SLG/Test/NpcController.cs</url>
-          <line>232</line>
+          <line>250</line>
           <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Test\NpcController.cs" containingFunctionPresentation="方法 'FixedUpdate'">
             <startOffsets>
-              <option value="6336" />
+              <option value="6962" />
             </startOffsets>
             <endOffsets>
-              <option value="6377" />
+              <option value="6997" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="35" />

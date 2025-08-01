@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/TimeRewinder/ExampleScene/TimeRewindExample 4.unity
+    guid: 61e52f11a58d9ee4eb03f635ed64733e
   m_configObjects: {}

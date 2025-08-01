@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using TVA;
 using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
     public Color normalColor = Color.white;
     public Color overlapColor = Color.red;
+    public Direct direct;
 
     public LayerMask npcLayer; // 只检测 NPC 层
     private float checkRadius;
@@ -113,14 +115,14 @@ public class Ball : MonoBehaviour
         return overlapCount <= 0;
     }
 
-    public void BeginTimeControl(float lifeTime,float rate)
+    public void BeginTimeControl(float lifeTime,int rate)
     {
         Destroy(gameObject, lifeTime); // 5 秒后销毁
 
         beginTC = true;
         foreach (IAreaEntityListener entity in npcsInside)
         {
-            entity.OnEnterTCArea(rate);
+            entity.OnEnterTCArea(direct,rate);
         }
     }
   

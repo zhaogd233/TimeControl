@@ -8,23 +8,17 @@ namespace TVA
         /// </summary>
         /// <param name="delaTime"></param>
         /// <param name="rate"></param>
-        void Forward(float delaTime,float rate);
+        void Forward(int rate);
 
         /// <summary>
         ///     只要往回走就是回溯
         ///     不支持自由预览数据。回溯再正播算重新计算，不是用的历史数据
         ///     因为可能回溯之后，新变化value
         /// </summary>
-        /// <param name="targetSeconds">直接回溯到targetsec</param>
+        /// <param name="偏移回溯0代表没回溯 ">♾️->0</param>
         /// <param name="rate"></param>
-        void Rewind(float targetSeconds, float rate);
+        void Rewind(float seconds, float rate);
 
-        /// <summary>
-        /// 偏移回溯，0代表没回溯  ♾️->0
-        /// </summary>
-        /// <param name="seconds"></param>
-        /// <param name="rate"></param>
-        void RewindOffset(float seconds, float rate);
         
         /// <summary>
         ///     rewind 结束，之后就继续正播

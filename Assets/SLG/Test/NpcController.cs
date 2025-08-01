@@ -65,12 +65,12 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
         if (!bUpdateTRS)
             return;
         // 平滑旋转
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime * _rate);
 
         if (isRunning)
         {
             // 持续向前移动
-            transform.position += transform.forward * runSpeed * Time.deltaTime;
+            transform.position += transform.forward * runSpeed * Time.deltaTime * _rate;
             var needTurn = false;
 
             // 如果出界 → 掉头
@@ -101,7 +101,7 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
             if(recordTime <= 0)
                 TimeTMP.color = Color.red;
             else
-            if(_animationTCable.bRewinding)
+            if(_animationTCable.TCDirect == Direct.Rewind)
                 TimeTMP.color = Color.blue;
             else
             {
@@ -113,9 +113,8 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
 
     private void OnBeginRewindAnimation()
     {
-        StopCoroutine("PlayNextAfter");
+        StopAllCoroutines();
         anim.Stop();
-
         bUpdateTRS = false;
     }
 
@@ -132,8 +131,10 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
 
     private void PlayRandomAnimation(string lastClip = "", float leftTime = 0f)
     {
+        StopAllCoroutines();
+
         if (animationNames == null || animationNames.Length == 0) return;
-        if (_animationTCable != null && _animationTCable.bRewinding)
+        if (_animationTCable != null && _animationTCable.TCDirect == Direct.Rewind)
             return;
 
         // 随机挑选动画
@@ -161,19 +162,33 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
         }
 
         // 播放动画
-        if (_animationTCable != null && !_animationTCable.bRewinding)
+        if (_animationTCable != null && _animationTCable.TCDirect == Direct.Forward)
+        {
             anim.Play(clipName);
+            state.speed = _rate;
+        }
+        
 
         // 如果是 skill 动画，则播放特效
         if (clipName.Contains("Skill_Huixuanzhan") && wuqiEffect != null)
             //   wuqiEffect.Play();
+        {
             wuqiEffect.gameObject.SetActive(true);
+            ParticleSystem[] ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
+            foreach (ParticleSystem particleSystem in ps)
+            {
+                var main = particleSystem.main;
+                main.simulationSpeed = _rate;
+            }
+        }
+        
         else
             //  wuqiEffect.Stop();
             wuqiEffect.gameObject.SetActive(false);
 
         // 延迟到动画结束时调用下一次
-        StartCoroutine(PlayNextAfter(state.length - state.time % state.length));
+      //  Debug.Log("play:"+state.name +"dleay "+(state.length - state.time % state.length)/_rate);
+        StartCoroutine(PlayNextAfter((state.length - state.time % state.length)/_rate));
     }
 
     private IEnumerator PlayNextAfter(float delay)
@@ -187,13 +202,15 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
     private ITCable[] _TCables = null;
     private bool bRewinding,_bPrepareFinishRewind,bInArea;
     private float offsetRewindSec = 0f;
-    private float _rate;
+    private int _rate = 1;
     private Camera _camera;
 
-    public void OnEnterTCArea(float rate)
+    public void OnEnterTCArea(Direct direct,int rate)
     {
         _TCables = GetComponentsInChildren<ITCable>();
-        bRewinding = true;
+        
+        if(direct == Direct.Rewind)
+          bRewinding = true;
         bInArea = true;
         _bPrepareFinishRewind = false;
         offsetRewindSec = 0f;
@@ -209,6 +226,7 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
     {
         _bPrepareFinishRewind = true;
         offsetRewindSec = 0f;
+        _rate = 1;
     }
     
     private void FixedUpdate()
@@ -230,13 +248,13 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
         if (bRewinding)
             foreach (ITCable tCable in _TCables)
             {
-                tCable.RewindOffset(offsetRewindSec, 1f);
+                tCable.Rewind(offsetRewindSec, 1f);
                // Debug.Log(offsetRewindSec);
             }
         else
             foreach (ITCable tCable in _TCables)
             {
-                tCable.Forward(Time.deltaTime, 1f);
+                tCable.Forward(_rate);
             }
     }
     #endregion

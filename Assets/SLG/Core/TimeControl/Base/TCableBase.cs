@@ -3,6 +3,11 @@ using UnityEngine;
 
 namespace TVA
 {
+    public enum Direct
+    {
+        Forward, //正向
+        Rewind, //回溯
+    }
     public abstract class TCableBase<T> : MonoBehaviour, ITCable
     {
         private float _lastRewindSeconds,_escapeTime;
@@ -10,6 +15,8 @@ namespace TVA
         public bool bDebug = false;
 
         private float _maxSecond;
+        private int forwardRate = 1;
+        public Direct TCDirect = Direct.Forward;
 
         /// <summary>
         ///     回溯结束，通知逻辑层继续更新逻辑，当前记录的最后行为会继续进行，之后逻辑更新
@@ -21,27 +28,38 @@ namespace TVA
         /// </summary>
         public Action StartRewindEvent;
 
-        public bool bRewinding { private set; get; }
-
         protected virtual void Start()
         {
             InitTCObj();
             SetDebug(bDebug);
         }
 
+        protected void FixedUpdate()
+        {
+            if(TCDirect == Direct.Forward)
+                ForwardInternal(Time.fixedDeltaTime,forwardRate);
+            
+        }
+
+        public void Forward(int rate)
+        {
+            this.forwardRate = Mathf.Max(rate,forwardRate);
+        }
+        
         /// <summary>
         ///     正播&加速
         ///     只有从没有的数据开始播，才算记录，旧的加速还是回溯。
+        /// rate 倍速要写多份
         /// </summary>
-        public void Forward(float delaTime,float rate)
+        public void ForwardInternal(float delaTime,float rate)
         {
-            if (bRewinding)
-                return;
-            
-            _escapeTime+= delaTime;
+            _escapeTime+= delaTime * rate;
             _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
             var value = GetCurTrackData(rate);
-            RecordValue(value);
+            for (int i = 0; i < rate; i++)
+            {
+                RecordValue(value);
+            }
             //判断是否超过已经最大记录，如果
             // TrackAction(rate);
         }
@@ -61,14 +79,14 @@ namespace TVA
             }
             _lastRewindSeconds = seconds;
 
-            if (!bRewinding && StartRewindEvent != null)
+            if (TCDirect == Direct.Forward && StartRewindEvent != null)
             {
-                bRewinding = true;
+                TCDirect = Direct.Rewind;
                 StartRewindEvent();
             }
             else
             {
-                bRewinding = true;
+                TCDirect = Direct.Rewind;
             }
 
             //TODO 判断是否超边界，取边界值
@@ -87,7 +105,7 @@ namespace TVA
 
         public void FinishRewind()
         {
-            bRewinding = false;
+            TCDirect = Direct.Forward;
             if (_recordbuffer == null)
             {
                 Debug.LogError("尚未调用Initialized");

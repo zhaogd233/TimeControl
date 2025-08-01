@@ -9,7 +9,7 @@ public class DragSpawnButton : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     private GameObject currentBall;
     public float ballLifeTime = 5;
-    public float rate = 1f;
+    public int rate = 1;
     public void OnBeginDrag(PointerEventData eventData)
     {
         SpawnBall(eventData);
