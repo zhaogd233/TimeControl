@@ -66,6 +66,14 @@
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <method v="2" />
     </configuration>
+    <configuration name="独立播放器" type="RunUnityExe" factoryName="Unity Executable">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/TVA\TimeRewinderProject.exe" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="F:\Project\UnityRewind\UnityTimeRewinder-main\TVA" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <method v="2" />
+    </configuration>
     <configuration name="单元测试(批处理模式)" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="F:\Program Files\Unity 2022.3.37f1\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath F:\Project\UnityRewind\UnityTimeRewinder-main -testResults Logs/results.xml -logFile Logs/Editor.log -testPlatform EditMode -debugCodeOptimization" />
@@ -112,7 +120,7 @@
       <option name="presentableId" value="Default" />
       <updated>1753861099966</updated>
       <workItem from="1753861101827" duration="42350000" />
-      <workItem from="1753959192505" duration="27740000" />
+      <workItem from="1753959192505" duration="29427000" />
     </task>
     <servers />
   </component>
@@ -160,10 +168,10 @@
           <line>119</line>
           <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Test\boll.cs" containingFunctionPresentation="方法 'BeginTimeControl'">
             <startOffsets>
-              <option value="3388" />
+              <option value="3400" />
             </startOffsets>
             <endOffsets>
-              <option value="3418" />
+              <option value="3430" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="33" />
@@ -173,26 +181,39 @@
           <line>135</line>
           <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Test\boll.cs" containingFunctionPresentation="方法 'Update'">
             <startOffsets>
-              <option value="3756" />
+              <option value="3768" />
             </startOffsets>
             <endOffsets>
-              <option value="3769" />
+              <option value="3781" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/SLG/Test/NpcController.cs</url>
-          <line>250</line>
+          <line>299</line>
           <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Test\NpcController.cs" containingFunctionPresentation="方法 'FixedUpdate'">
             <startOffsets>
-              <option value="6962" />
+              <option value="8668" />
             </startOffsets>
             <endOffsets>
-              <option value="6997" />
+              <option value="8703" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="35" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/SLG/Test/NpcController.cs</url>
+          <line>132</line>
+          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Test\NpcController.cs" containingFunctionPresentation="方法 'PlayRandomAnimation'">
+            <startOffsets>
+              <option value="3663" />
+            </startOffsets>
+            <endOffsets>
+              <option value="3683" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="37" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

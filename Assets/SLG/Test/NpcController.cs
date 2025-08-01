@@ -102,15 +102,14 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
                 TimeTMP.color = Color.red;
             else
             if(_animationTCable.TCDirect == Direct.Rewind)
-                TimeTMP.color = Color.blue;
+                TimeTMP.color = new Color(0.4845996f,0,1,1);
             else
             {
                 TimeTMP.color = Color.green;
             }
         }
     }
-
-
+    
     private void OnBeginRewindAnimation()
     {
         StopAllCoroutines();
@@ -215,6 +214,31 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
         _bPrepareFinishRewind = false;
         offsetRewindSec = 0f;
         _rate = rate;
+
+        //当前播放的需要加速
+        if (direct == Direct.Forward)
+        {
+            if(wuqiEffect.gameObject.activeInHierarchy)
+            {
+                ParticleSystem[] ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
+                foreach (ParticleSystem particleSystem in ps)
+                {
+                    var main = particleSystem.main;
+                    main.simulationSpeed = rate;
+                }
+            }
+            
+            foreach (AnimationState state in anim)
+            {
+                if (anim.IsPlaying(state.name))
+                {
+                    anim[state.name].speed = rate;
+                    
+                    StopAllCoroutines();
+                    StartCoroutine(PlayNextAfter((state.length - state.time % state.length)/_rate));
+                }
+            }
+        }
     }
 
     public void OnStayInTCArea(float deltaTime)
@@ -222,11 +246,36 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
         offsetRewindSec+=deltaTime * _rate;
     }
 
-    public void OnExitTCArea()
+    public void OnExitTCArea(Direct direct)
     {
         _bPrepareFinishRewind = true;
         offsetRewindSec = 0f;
         _rate = 1;
+        
+        //当前播放的需要加速
+        if (direct == Direct.Forward)
+        {
+            if(wuqiEffect.gameObject.activeInHierarchy)
+            {
+                ParticleSystem[] ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
+                foreach (ParticleSystem particleSystem in ps)
+                {
+                    var main = particleSystem.main;
+                    main.simulationSpeed = 1;
+                }
+            }
+            
+            foreach (AnimationState state in anim)
+            {
+                if (anim.IsPlaying(state.name))
+                {
+                    anim[state.name].speed = 1;
+                    
+                    StopAllCoroutines();
+                    StartCoroutine(PlayNextAfter((state.length - state.time % state.length)/_rate));
+                }
+            }
+        }
     }
     
     private void FixedUpdate()

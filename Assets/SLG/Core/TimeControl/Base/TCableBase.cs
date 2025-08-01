@@ -105,26 +105,33 @@ namespace TVA
 
         public void FinishRewind()
         {
-            TCDirect = Direct.Forward;
             if (_recordbuffer == null)
             {
                 Debug.LogError("尚未调用Initialized");
                 return;
             }
 
-            //回溯结束，通知上层逻辑继续执行逻辑运算
-            if (TryGetRecordValue(_lastRewindSeconds, out var valuesToRead))
+            if(TCDirect == Direct.Rewind)
             {
-                FinishRewindAction(valuesToRead);
+                TCDirect = Direct.Forward;
+                //回溯结束，通知上层逻辑继续执行逻辑运算
+                if (TryGetRecordValue(_lastRewindSeconds, out var valuesToRead))
+                {
+                    FinishRewindAction(valuesToRead);
 
-                if (FinishRewindEvent != null)
-                    FinishRewindEvent(valuesToRead, _lastRewindSeconds);
+                    if (FinishRewindEvent != null)
+                        FinishRewindEvent(valuesToRead, _lastRewindSeconds);
+                }
+
+                _recordbuffer.MoveLastBufferPos(_lastRewindSeconds);
+                _escapeTime -= _lastRewindSeconds;
+                _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
+                _lastRewindSeconds = 0;
             }
-
-            _recordbuffer.MoveLastBufferPos(_lastRewindSeconds);
-            _escapeTime -= _lastRewindSeconds;
-            _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
-            _lastRewindSeconds = 0;
+            else
+            {
+                
+            }
         }
 
         /// <summary>

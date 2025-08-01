@@ -78,7 +78,7 @@ public class Ball : MonoBehaviour
             if (entity != null)
             {
                 if (beginTC)
-                    entity.OnExitTCArea();
+                    entity.OnExitTCArea(direct);
                 npcsInside.Remove(entity);
             }
         }
@@ -95,7 +95,7 @@ public class Ball : MonoBehaviour
         
         foreach (IAreaEntityListener entity in npcsInside)
         {
-            entity.OnExitTCArea();
+            entity.OnExitTCArea(direct);
         }
 
         beginTC = false;
