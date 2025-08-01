@@ -21,6 +21,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/18/ac07fc05/Tuple`2.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/36/22b579c3/Action`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/94/403c8a04/Array.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a14ba41591b145589fb99270dfefc5711528c0/90/9a9ec1a5/Camera.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a14ba41591b145589fb99270dfefc5711528c0/9e/2368f59e/Behaviour.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a269079ccdc14d98902cc431fc41467427800/bb/d455d17b/AnimationState.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b9d7da0ac6a14b08874de0cbbe6fdde726400/b1/c59c2edb/ParticleSystem.cs" root0="FORCE_HIGHLIGHTING" />
@@ -110,7 +111,7 @@
       <option name="presentableId" value="Default" />
       <updated>1753861099966</updated>
       <workItem from="1753861101827" duration="42350000" />
-      <workItem from="1753959192505" duration="17259000" />
+      <workItem from="1753959192505" duration="20478000" />
     </task>
     <servers />
   </component>
@@ -181,13 +182,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/SLG/Test/NpcController.cs</url>
-          <line>197</line>
+          <line>232</line>
           <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Test\NpcController.cs" containingFunctionPresentation="方法 'FixedUpdate'">
             <startOffsets>
-              <option value="5500" />
+              <option value="6336" />
             </startOffsets>
             <endOffsets>
-              <option value="5541" />
+              <option value="6377" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="35" />

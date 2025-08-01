@@ -9,6 +9,8 @@ namespace TVA
         private TVRingBuffer<T> _recordbuffer;
         public bool bDebug = false;
 
+        private float _maxSecond;
+
         /// <summary>
         ///     回溯结束，通知逻辑层继续更新逻辑，当前记录的最后行为会继续进行，之后逻辑更新
         /// </summary>
@@ -37,6 +39,7 @@ namespace TVA
                 return;
             
             _escapeTime+= delaTime;
+            _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
             var value = GetCurTrackData(rate);
             RecordValue(value);
             //判断是否超过已经最大记录，如果
@@ -101,7 +104,8 @@ namespace TVA
             }
 
             _recordbuffer.MoveLastBufferPos(_lastRewindSeconds);
-            _escapeTime = _lastRewindSeconds;
+            _escapeTime -= _lastRewindSeconds;
+            _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
             _lastRewindSeconds = 0;
         }
 
@@ -110,6 +114,7 @@ namespace TVA
         /// </summary>
         public void Initialized(int maxSecond, float updateDelta)
         {
+            _maxSecond = maxSecond;
             var countPerSec = (int)(1.0f / updateDelta);
             _recordbuffer = new TVRingBuffer<T>(maxSecond * countPerSec, countPerSec);
             TCManager.Instance.AddObjectForTracking(this);
@@ -181,6 +186,11 @@ namespace TVA
             }
 
             _recordbuffer.SetDebug(b);
+        }
+
+        public float GetRecordTime()
+        {
+            return _escapeTime - _lastRewindSeconds;
         }
 
         #region 子类需要去实现的具体逻辑

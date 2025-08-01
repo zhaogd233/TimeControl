@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using TVA;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -18,6 +19,8 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
     public Transform wuqiEffect;
 
     private AnimationTCable _animationTCable;
+
+    public TextMeshPro TimeTMP;
 
     private readonly string[] animationNames = new string[11]
     {
@@ -39,6 +42,11 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
 
     // 平滑转向目标
     private Quaternion targetRotation;
+
+    private void Awake()
+    {
+        _camera = Camera.main;
+    }
 
     private void Start()
     {
@@ -76,6 +84,28 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
                 // 随机一个大概 90~180° 的新方向
                 var newY = transform.eulerAngles.y + Random.Range(90f, 180f);
                 targetRotation = Quaternion.Euler(0, newY, 0);
+            }
+        }
+    }
+    
+    void LateUpdate()
+    {
+        if (_camera != null  && TimeTMP != null)
+        {
+            // 直接面向相机
+            TimeTMP.transform.forward = _camera.transform.forward;
+
+            float recordTime =Mathf.Max(0, _animationTCable.GetRecordTime());
+            TimeTMP.text = $"{recordTime:F1}s";
+            
+            if(recordTime <= 0)
+                TimeTMP.color = Color.red;
+            else
+            if(_animationTCable.bRewinding)
+                TimeTMP.color = Color.blue;
+            else
+            {
+                TimeTMP.color = Color.green;
             }
         }
     }
@@ -157,6 +187,9 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
     private ITCable[] _TCables = null;
     private bool bRewinding,_bPrepareFinishRewind,bInArea;
     private float offsetRewindSec = 0f;
+    private float _rate;
+    private Camera _camera;
+
     public void OnEnterTCArea(float rate)
     {
         _TCables = GetComponentsInChildren<ITCable>();
@@ -164,16 +197,18 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
         bInArea = true;
         _bPrepareFinishRewind = false;
         offsetRewindSec = 0f;
+        _rate = rate;
     }
 
     public void OnStayInTCArea(float deltaTime)
     {
-        offsetRewindSec+=deltaTime;
+        offsetRewindSec+=deltaTime * _rate;
     }
 
     public void OnExitTCArea()
     {
         _bPrepareFinishRewind = true;
+        offsetRewindSec = 0f;
     }
     
     private void FixedUpdate()
