@@ -24,8 +24,4 @@ public class ActiveStateTCable : TCableBase<bool>
     protected override void FinishRewindAction(bool rewindValue)
     {
     }
-
-    protected override void DestoryCompelety()
-    {
-    }
 }

@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TVA
 {
@@ -11,10 +13,12 @@ namespace TVA
     public abstract class TCableBase<T> : MonoBehaviour, ITCable
     {
         public bool bDebug;
-        public bool bDestory; //标记已被逻辑销毁，但可能会回溯出来
-        public Direct TCDirect = Direct.Forward;
+        public bool IsDestorying { private set; get; } //标记已被逻辑销毁，但可能会回溯出来
+        [HideInInspector]
+         public Direct TCDirect = Direct.Forward;
 
         private float _escapeTime;
+        private float _destoryTime;
 
         /// <summary>
         ///     已回溯时间
@@ -26,6 +30,8 @@ namespace TVA
         private int forwardRate = 1;
         private int rewindRate = 1;
 
+        public Action DestoryCompeletyAction;
+
         protected virtual void Start()
         {
             InitTCObj();
@@ -35,9 +41,32 @@ namespace TVA
         public void FixedTick(float deltaTime)
         {
             if (TCDirect == Direct.Forward)
-                ForwardInternal(deltaTime);
+            {
+                if (IsDestorying)
+                {
+                    if(_destoryTime > _maxSecond)
+                        DestoryCompeletyInternal();
+                    else
+                    {
+                        _destoryTime += deltaTime * forwardRate;
+                    }
+                }else
+                 ForwardInternal(deltaTime);
+            }
             else
-                RewindInternal(deltaTime);
+            {
+                if (IsDestorying)
+                {
+                    if(_destoryTime > 0)
+                        _destoryTime -= deltaTime * rewindRate;
+                    else
+                    {
+                        IsDestorying = false;
+                        _destoryTime = 0;
+                    }
+                }else
+                    RewindInternal(deltaTime);
+            }
         }
 
         public void Forward(int rate)
@@ -99,20 +128,13 @@ namespace TVA
             TCManager.Instance.AddObjectForTracking(this);
         }
 
-        /*/// <summary>
-        /// 生命周期
-        /// </summary>
-        public abstract void OnEnable();
-        public abstract void OnDisable();*/
-
         /// <summary>
         ///     销毁的时候，先disable,等过了记录周期之后，才彻底销毁
         /// </summary>
         public void OnDestroy()
         {
-            bDestory = true;
-
-            //标记隐藏，下个记录周期之后彻底删除
+            IsDestorying = true;
+            _destoryTime = 0;
         }
 
         /// <summary>
@@ -174,7 +196,7 @@ namespace TVA
             return true;
         }
 
-        public void _DestoryCompelety()
+        public void DestoryCompeletyInternal()
         {
             if (_recordbuffer == null)
             {
@@ -184,7 +206,9 @@ namespace TVA
 
             _recordbuffer.Clear();
             TCManager.Instance.RemoveObjectForTracking(this);
-            DestoryCompelety();
+            
+            if(DestoryCompeletyAction != null)
+              DestoryCompeletyAction();
         }
 
         public void SetDebug(bool b)
@@ -201,6 +225,11 @@ namespace TVA
         public float GetRecordTime()
         {
             return _escapeTime - _lastRewindSeconds;
+        }
+
+        public float GetDestroyingTime()
+        {
+            return _destoryTime;
         }
 
         public bool IsTimeControling()
@@ -230,9 +259,6 @@ namespace TVA
         /// </summary>
         /// <param name="rewindValue"></param>
         protected abstract void FinishRewindAction(T rewindValue);
-
-
-        protected abstract void DestoryCompelety();
 
         #endregion
     }

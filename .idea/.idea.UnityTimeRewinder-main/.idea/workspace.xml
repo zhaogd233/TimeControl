@@ -13,6 +13,9 @@
   <component name="DpaMonitoringSettings">
     <option name="firstShow" value="false" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2d8783c7af0442318483a199a473c55b175e00/23/d477d04e/GameObject.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2d8783c7af0442318483a199a473c55b175e00/33/702a1c4f/Time.cs" root0="SKIP_HIGHLIGHTING" />
@@ -27,21 +30,9 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b9d7da0ac6a14b08874de0cbbe6fdde726400/b1/c59c2edb/ParticleSystem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c0b7b90d34a54066a7234dad6925511646ac00/56/0915ae57/List`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/c7c40cbd43ca4fb8b6951e7d929b375226ec0/11/f686b8c4/ParticleSystem.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/AnimationTCable.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/AnimationTCable.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/AnimationTCable.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/ITCable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/ParticleSystemTCable.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://F:/Project/UnityRewind/UnityTimeRewinder-main/Assets/SLG/Core/TimeControl/Base/TCableBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Base/TransformTCable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Data/TVRingBuffer.cs" root0="FORCE_HIGHLIGHTING" />
@@ -64,13 +55,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;附加到 Unity 编辑器.附加到 Unity 编辑器.executor&quot;: &quot;Debug&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "<未知>",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "附加到 Unity 编辑器.附加到 Unity 编辑器.executor": "Debug"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="附加到 Unity 编辑器.附加到 Unity 编辑器">
     <configuration name="启动 Unity" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="F:\Program Files\Unity 2022.3.37f1\Editor\Unity.exe" />
@@ -96,13 +89,15 @@
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <method v="2" />
     </configuration>
-    <configuration name="附加到 Unity 编辑器" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+    <configuration name="附加到 Unity 编辑器" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="45460">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" />
+      <option name="pid" value="45460" />
       <option name="projectPathOnTarget" />
       <option name="runtimes">
-        <list />
+        <list>
+          <MonoRuntime />
+        </list>
       </option>
       <option name="selectedOptions">
         <list />
@@ -133,6 +128,7 @@
       <updated>1753861099966</updated>
       <workItem from="1753861101827" duration="42350000" />
       <workItem from="1753959192505" duration="41277000" />
+      <workItem from="1754297406604" duration="6306000" />
     </task>
     <servers />
   </component>
@@ -143,6 +139,28 @@
     <option name="unityProjectFolder" value="true" />
   </component>
   <component name="UnityUnitTestConfiguration" currentTestLauncher="Both" />
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="GitHub.CommitStatus" />
+        <option value="Default.Subject" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
@@ -176,56 +194,43 @@
           <option name="timeStamp" value="26" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/SLG/Test/boll.cs</url>
-          <line>129</line>
-          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Test\boll.cs" containingFunctionPresentation="方法 'BeginTimeControl'">
-            <startOffsets>
-              <option value="3549" />
-            </startOffsets>
-            <endOffsets>
-              <option value="3579" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="33" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/SLG/Test/NpcController.cs</url>
-          <line>242</line>
+          <line>287</line>
           <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Test\NpcController.cs" containingFunctionPresentation="方法 'OnExitTCArea'">
             <startOffsets>
-              <option value="6781" />
+              <option value="8231" />
             </startOffsets>
             <endOffsets>
-              <option value="6810" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="38" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/SLG/Test/NpcController.cs</url>
-          <line>268</line>
-          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Test\NpcController.cs" containingFunctionPresentation="方法 'OnExitTCArea'">
-            <startOffsets>
-              <option value="7669" />
-            </startOffsets>
-            <endOffsets>
-              <option value="7696" />
+              <option value="8258" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="39" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/SLG/Test/NpcController.cs</url>
-          <line>272</line>
+          <line>291</line>
           <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Test\NpcController.cs" containingFunctionPresentation="方法 'OnExitTCArea'">
             <startOffsets>
-              <option value="7793" />
+              <option value="8355" />
             </startOffsets>
             <endOffsets>
-              <option value="7811" />
+              <option value="8373" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="40" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/SLG/Core/TimeControl/Manager/TCManager.cs</url>
+          <line>42</line>
+          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\SLG\Core\TimeControl\Manager\TCManager.cs" containingFunctionPresentation="方法 'FixedUpdate'">
+            <startOffsets>
+              <option value="1111" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1145" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="42" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

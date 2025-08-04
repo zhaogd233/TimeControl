@@ -29,11 +29,6 @@ namespace TVA
             
         }
 
-        protected override void DestoryCompelety()
-        {
-            // throw new System.NotImplementedException();
-        }
-
         protected override TransformValues GetCurTrackData(float rate)
         {
             TransformValues valuesToWrite;

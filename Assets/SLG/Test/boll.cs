@@ -27,7 +27,6 @@ public class Ball : MonoBehaviour
 
         // 半径取最大边长的一半（保证覆盖整个球）
         checkRadius = GetSphereColliderRadius();
-        Debug.Log(checkRadius);
     }
 
     private void Update()

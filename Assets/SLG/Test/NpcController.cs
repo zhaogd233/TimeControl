@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using TVA;
+using Unity.Properties;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -19,6 +20,9 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
     public Transform wuqiEffect;
 
     public TextMeshPro TimeTMP;
+    
+    //隐藏实体，但保留碰撞和ui
+    public GameObject actor;
 
     private readonly string[] animationNames = new string[11]
     {
@@ -51,10 +55,11 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
     private void Start()
     {
         if (anim == null)
-            anim = GetComponent<Animation>();
+            anim = GetComponentInChildren<Animation>();
         _TCables = GetComponentsInChildren<ITCable>();
 
-        _animationTCable = GetComponent<AnimationTCable>();
+        _animationTCable = GetComponentInChildren<AnimationTCable>();
+        _animationTCable.DestoryCompeletyAction = OnDestroyImmediately;
         targetRotation = transform.rotation;
         bUpdateTRS = true;
         PlayRandomAnimation();
@@ -99,6 +104,12 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
             var recordTime = Mathf.Max(0, _animationTCable.GetRecordTime());
             TimeTMP.text = $"{recordTime:F1}s";
 
+            if (_animationTCable.IsDestorying)
+            {
+                TimeTMP.text = $"dead:{_animationTCable.GetDestroyingTime():F1}s";
+                TimeTMP.color = Color.black;
+                return;
+            };
             if (recordTime <= 0)
                 TimeTMP.color = Color.red;
             else if (_animationTCable.TCDirect == Direct.Rewind)
@@ -168,8 +179,9 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
             wuqiEffect.gameObject.SetActive(false);
         }
 
-        if (clipName.Equals("Attack_2")) TryDestory();
-
+        if (clipName.Equals("Attack_2")) 
+            TryDestory();
+else
         // 延迟到动画结束时调用下一次
         StartCoroutine(PlayNextAfter((state.length - state.time % state.length) / _rate));
     }
@@ -182,7 +194,14 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
 
     private void TryDestory()
     {
+        StopAllCoroutines();
+        actor.SetActive(false);
         foreach (var tCable in _TCables) tCable.OnDestroy();
+    }
+    
+    private void OnDestroyImmediately()
+    {
+        Destroy(gameObject);
     }
 
     #region 受到操控区域的作用

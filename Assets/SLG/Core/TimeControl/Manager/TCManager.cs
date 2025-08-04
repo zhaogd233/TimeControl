@@ -12,7 +12,9 @@ namespace TVA
         /// </summary>
         private bool _bPrepareFinishRewind;
 
-        private List<ITCable> _TCables; // 时间可操控对象
+        private HashSet<ITCable> _TCables; // 时间可操控对象
+        private List<ITCable> _AddCables; // 时间可操控对象
+        private List<ITCable> _DelCables; // 时间可操控对象
 
         private float rewindSeconds;
 
@@ -30,25 +32,18 @@ namespace TVA
         {
             if (Instance != null && Instance != this) Destroy(Instance);
 
-            _TCables = new List<ITCable>();
+            _TCables = new HashSet<ITCable>();
+            _DelCables = new List<ITCable>();
+            _AddCables = new List<ITCable>();
             Instance = this;
         }
 
         private void FixedUpdate()
         {
-            if (_bPrepareFinishRewind)
-            {
-                _bPrepareFinishRewind = false;
-                bRewinding = false;
-
-                _TCables.ForEach(x => x.FinishTimeControl());
-            }
-
-            /*if (bRewinding)
-                _TCables.ForEach(x => x.Rewind(rewindSeconds, 1f));
-            else
-                _TCables.ForEach(x => x.Forward(1));*/
-
+            foreach (var tCable in _AddCables) _TCables.Add(tCable);
+            _AddCables.Clear();
+            foreach (var tCable in _DelCables) _TCables.Remove(tCable);
+            _DelCables.Clear();
             foreach (var tCable in _TCables) tCable.FixedTick(Time.fixedDeltaTime);
         }
 
@@ -90,12 +85,12 @@ namespace TVA
         /// <param name="tcable"></param>
         public void AddObjectForTracking(ITCable tcable)
         {
-            _TCables.Add(tcable);
+            _AddCables.Add(tcable);
         }
 
         public void RemoveObjectForTracking(ITCable tcable)
         {
-            _TCables.Remove(tcable);
+            _DelCables.Add(tcable);
         }
 
         #endregion

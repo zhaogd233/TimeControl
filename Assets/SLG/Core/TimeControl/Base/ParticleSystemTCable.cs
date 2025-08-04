@@ -94,10 +94,5 @@ namespace TVA
                 }
             }
         }
-
-        protected override void DestoryCompelety()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
