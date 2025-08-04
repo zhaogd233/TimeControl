@@ -4,6 +4,7 @@ using UnityEngine;
 public class ActiveStateTCable : TCableBase<bool>
 {
     public GameObject target;
+
     protected override void InitTCObj()
     {
         Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime);
@@ -23,7 +24,6 @@ public class ActiveStateTCable : TCableBase<bool>
     protected override void FinishRewindAction(bool rewindValue)
     {
     }
-
 
     protected override void DestoryCompelety()
     {

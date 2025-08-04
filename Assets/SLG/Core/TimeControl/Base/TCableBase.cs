@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace TVA
@@ -6,27 +5,26 @@ namespace TVA
     public enum Direct
     {
         Forward, //正向
-        Rewind, //回溯
+        Rewind //回溯
     }
+
     public abstract class TCableBase<T> : MonoBehaviour, ITCable
     {
-        private float _lastRewindSeconds,_escapeTime;
-        private TVRingBuffer<T> _recordbuffer;
-        public bool bDebug = false;
-
-        private float _maxSecond;
-        private int forwardRate = 1;
+        public bool bDebug;
+        public bool bDestory; //标记已被逻辑销毁，但可能会回溯出来
         public Direct TCDirect = Direct.Forward;
 
-        /// <summary>
-        ///     回溯结束，通知逻辑层继续更新逻辑，当前记录的最后行为会继续进行，之后逻辑更新
-        /// </summary>
-        public Action<T, float> FinishRewindEvent;
+        private float _escapeTime;
 
         /// <summary>
-        ///     通知上层逻辑层开始回溯，逻辑内的更新暂停
+        ///     已回溯时间
         /// </summary>
-        public Action StartRewindEvent;
+        private float _lastRewindSeconds;
+
+        private float _maxSecond;
+        private TVRingBuffer<T> _recordbuffer;
+        private int forwardRate = 1;
+        private int rewindRate = 1;
 
         protected virtual void Start()
         {
@@ -34,34 +32,18 @@ namespace TVA
             SetDebug(bDebug);
         }
 
-        protected void FixedUpdate()
+        public void FixedTick(float deltaTime)
         {
-            if(TCDirect == Direct.Forward)
-                ForwardInternal(Time.fixedDeltaTime,forwardRate);
-            
+            if (TCDirect == Direct.Forward)
+                ForwardInternal(deltaTime);
+            else
+                RewindInternal(deltaTime);
         }
 
         public void Forward(int rate)
         {
-            this.forwardRate = Mathf.Max(rate,forwardRate);
-        }
-        
-        /// <summary>
-        ///     正播&加速
-        ///     只有从没有的数据开始播，才算记录，旧的加速还是回溯。
-        /// rate 倍速要写多份
-        /// </summary>
-        public void ForwardInternal(float delaTime,float rate)
-        {
-            _escapeTime+= delaTime * rate;
-            _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
-            var value = GetCurTrackData(rate);
-            for (int i = 0; i < rate; i++)
-            {
-                RecordValue(value);
-            }
-            //判断是否超过已经最大记录，如果
-            // TrackAction(rate);
+            TCDirect = Direct.Forward;
+            forwardRate = Mathf.Max(rate, forwardRate);
         }
 
         /// <summary>
@@ -70,40 +52,14 @@ namespace TVA
         /// </summary>
         /// <param name="seconds"></param>
         /// <param name="rate"></param>
-        public void Rewind(float seconds, float rate)
+        public void Rewind(int rate)
         {
-            if (seconds < 0 || seconds > _escapeTime)
-            {
-                Debug.LogError("越界" + seconds);
-                return;
-            }
-            _lastRewindSeconds = seconds;
-
-            if (TCDirect == Direct.Forward && StartRewindEvent != null)
-            {
-                TCDirect = Direct.Rewind;
-                StartRewindEvent();
-            }
-            else
-            {
-                TCDirect = Direct.Rewind;
-            }
-
-            //TODO 判断是否超边界，取边界值
-            if (TryGetRecordValue(seconds, out var valuesToRead))
-                RewindAction(valuesToRead);
-
-            //更新写入位置，之后的数据重新写入
-            //    buffers.MoveLastBufferPos(seconds);
+            TCDirect = Direct.Rewind;
+            _lastRewindSeconds = 0;
+            rewindRate = rate;
         }
 
-        public void RewindOffset(float seconds, float rate)
-        {
-          //  float targetSec = _escapeTime - seconds;
-            Rewind(seconds,rate);
-        }
-
-        public void FinishRewind()
+        public void FinishTimeControl()
         {
             if (_recordbuffer == null)
             {
@@ -111,26 +67,24 @@ namespace TVA
                 return;
             }
 
-            if(TCDirect == Direct.Rewind)
+            if (TCDirect == Direct.Rewind)
             {
                 TCDirect = Direct.Forward;
                 //回溯结束，通知上层逻辑继续执行逻辑运算
                 if (TryGetRecordValue(_lastRewindSeconds, out var valuesToRead))
                 {
                     FinishRewindAction(valuesToRead);
-
-                    if (FinishRewindEvent != null)
-                        FinishRewindEvent(valuesToRead, _lastRewindSeconds);
                 }
-
                 _recordbuffer.MoveLastBufferPos(_lastRewindSeconds);
                 _escapeTime -= _lastRewindSeconds;
                 _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
                 _lastRewindSeconds = 0;
+                rewindRate = 1;
             }
             else
             {
-                
+                forwardRate = 1;
+                TCDirect = Direct.Forward;
             }
         }
 
@@ -156,9 +110,40 @@ namespace TVA
         /// </summary>
         public void OnDestroy()
         {
-            //  OnDisable();
+            bDestory = true;
 
             //标记隐藏，下个记录周期之后彻底删除
+        }
+
+        /// <summary>
+        ///     正播&加速
+        ///     只有从没有的数据开始播，才算记录，旧的加速还是回溯。
+        ///     rate 倍速要写多份
+        /// </summary>
+        public void ForwardInternal(float delaTime)
+        {
+            _escapeTime += delaTime * forwardRate;
+            _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
+            var value = GetCurTrackData(forwardRate);
+            for (var i = 0; i < forwardRate; i++) RecordValue(value);
+            //判断是否超过已经最大记录，如果
+            // TrackAction(rate);
+        }
+
+        public void RewindInternal(float deltaTime)
+        {
+            var offsetRewindSeconds = _lastRewindSeconds + deltaTime * rewindRate;
+            if (offsetRewindSeconds < 0 || offsetRewindSeconds > _escapeTime)
+                return;
+
+            _lastRewindSeconds = offsetRewindSeconds;
+
+            //
+            if (TryGetRecordValue(offsetRewindSeconds, out var valuesToRead))
+                RewindAction(valuesToRead);
+
+            //更新写入位置，之后的数据重新写入
+            //    buffers.MoveLastBufferPos(seconds);
         }
 
         /// <summary>
@@ -218,6 +203,11 @@ namespace TVA
             return _escapeTime - _lastRewindSeconds;
         }
 
+        public bool IsTimeControling()
+        {
+            return rewindRate > 1 || forwardRate > 1;
+        }
+
         #region 子类需要去实现的具体逻辑
 
         protected abstract void InitTCObj();
@@ -234,13 +224,13 @@ namespace TVA
         /// </summary>
         /// <param name="curValue"></param>
         protected abstract void RewindAction(T curValue);
-
-
+        
         /// <summary>
-        ///     当回溯结束时刻,根据当前记录继续正播记录剩余的行为
+        /// 通知上层最后rewind的状态
         /// </summary>
-        /// <param name="rewindSeconds"></param>
+        /// <param name="rewindValue"></param>
         protected abstract void FinishRewindAction(T rewindValue);
+
 
         protected abstract void DestoryCompelety();
 

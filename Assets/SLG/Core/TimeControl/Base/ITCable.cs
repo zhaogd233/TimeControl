@@ -17,15 +17,14 @@ namespace TVA
         /// </summary>
         /// <param name="偏移回溯0代表没回溯 ">♾️->0</param>
         /// <param name="rate"></param>
-        void Rewind(float seconds, float rate);
+        void Rewind(int rate);
 
-        
         /// <summary>
-        ///     rewind 结束，之后就继续正播
+        ///     时间操控结束
         /// </summary>
         /// <summary>
         /// </summary>
-        void FinishRewind();
+        void FinishTimeControl();
 
         #region 生命周期，对外暴漏的可调用接口
 
@@ -33,6 +32,8 @@ namespace TVA
 
         /*void OnEnable();
         void OnDisable();*/
+
+        void FixedTick(float deltaTime);
 
         /// <summary>
         ///     销毁先隐藏，等过了记录周期之后，才彻底销毁

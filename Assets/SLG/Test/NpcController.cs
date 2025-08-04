@@ -4,7 +4,7 @@ using TVA;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class NpcController : MonoBehaviour,IAreaEntityListener
+public class NpcController : MonoBehaviour, IAreaEntityListener
 {
     [Header("Animation 组件")] public Animation anim;
 
@@ -17,8 +17,6 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
     [Header("转向速度（度/秒）")] public float turnSpeed = 180f; // 每秒旋转 180°
 
     public Transform wuqiEffect;
-
-    private AnimationTCable _animationTCable;
 
     public TextMeshPro TimeTMP;
 
@@ -37,6 +35,8 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
         "Attack_2"
     };
 
+    private AnimationTCable _animationTCable;
+
     private bool bUpdateTRS;
     private bool isRunning;
 
@@ -52,9 +52,9 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
     {
         if (anim == null)
             anim = GetComponent<Animation>();
+        _TCables = GetComponentsInChildren<ITCable>();
+
         _animationTCable = GetComponent<AnimationTCable>();
-        _animationTCable.StartRewindEvent = OnBeginRewindAnimation;
-        _animationTCable.FinishRewindEvent = OnEndRewindAnimation;
         targetRotation = transform.rotation;
         bUpdateTRS = true;
         PlayRandomAnimation();
@@ -65,7 +65,8 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
         if (!bUpdateTRS)
             return;
         // 平滑旋转
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime * _rate);
+        transform.rotation =
+            Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime * _rate);
 
         if (isRunning)
         {
@@ -87,45 +88,26 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
             }
         }
     }
-    
-    void LateUpdate()
+
+    private void LateUpdate()
     {
-        if (_camera != null  && TimeTMP != null)
+        if (_camera != null && TimeTMP != null)
         {
             // 直接面向相机
             TimeTMP.transform.forward = _camera.transform.forward;
 
-            float recordTime =Mathf.Max(0, _animationTCable.GetRecordTime());
+            var recordTime = Mathf.Max(0, _animationTCable.GetRecordTime());
             TimeTMP.text = $"{recordTime:F1}s";
-            
-            if(recordTime <= 0)
-                TimeTMP.color = Color.red;
-            else
-            if(_animationTCable.TCDirect == Direct.Rewind)
-                TimeTMP.color = new Color(0.4845996f,0,1,1);
-            else
-            {
-                TimeTMP.color = Color.green;
-            }
-        }
-    }
-    
-    private void OnBeginRewindAnimation()
-    {
-        StopAllCoroutines();
-        anim.Stop();
-        bUpdateTRS = false;
-    }
 
-    /// <summary>
-    ///     动画行为已经恢复并继续播放
-    /// </summary>
-    /// <param name="curAnimData"></param>
-    /// <param name="time"></param>
-    private void OnEndRewindAnimation(LegacyAnimationTrackedData curAnimData, float time)
-    {
-        PlayRandomAnimation(curAnimData.clipName, curAnimData.time);
-        bUpdateTRS = true;
+            if (recordTime <= 0)
+                TimeTMP.color = Color.red;
+            else if (_animationTCable.TCDirect == Direct.Rewind)
+                TimeTMP.color = new Color(0.4845996f, 0, 1, 1);
+            else if (_animationTCable.IsTimeControling())
+                TimeTMP.color = Color.green;
+            else
+                TimeTMP.color = Color.white;
+        }
     }
 
     private void PlayRandomAnimation(string lastClip = "", float leftTime = 0f)
@@ -166,28 +148,30 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
             anim.Play(clipName);
             state.speed = _rate;
         }
-        
 
         // 如果是 skill 动画，则播放特效
         if (clipName.Contains("Skill_Huixuanzhan") && wuqiEffect != null)
             //   wuqiEffect.Play();
         {
             wuqiEffect.gameObject.SetActive(true);
-            ParticleSystem[] ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
-            foreach (ParticleSystem particleSystem in ps)
+            var ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
+            foreach (var particleSystem in ps)
             {
                 var main = particleSystem.main;
                 main.simulationSpeed = _rate;
             }
         }
-        
+
         else
             //  wuqiEffect.Stop();
+        {
             wuqiEffect.gameObject.SetActive(false);
+        }
+
+        if (clipName.Equals("Attack_2")) TryDestory();
 
         // 延迟到动画结束时调用下一次
-      //  Debug.Log("play:"+state.name +"dleay "+(state.length - state.time % state.length)/_rate);
-        StartCoroutine(PlayNextAfter((state.length - state.time % state.length)/_rate));
+        StartCoroutine(PlayNextAfter((state.length - state.time % state.length) / _rate));
     }
 
     private IEnumerator PlayNextAfter(float delay)
@@ -196,115 +180,99 @@ public class NpcController : MonoBehaviour,IAreaEntityListener
         PlayRandomAnimation();
     }
 
+    private void TryDestory()
+    {
+        foreach (var tCable in _TCables) tCable.OnDestroy();
+    }
+
     #region 受到操控区域的作用
 
-    private ITCable[] _TCables = null;
-    private bool bRewinding,_bPrepareFinishRewind,bInArea;
-    private float offsetRewindSec = 0f;
-    private int _rate = 1;
+    private ITCable[] _TCables;
     private Camera _camera;
+    private int _rate = 1;
 
-    public void OnEnterTCArea(Direct direct,int rate)
+    public void OnEnterTCArea(Direct direct, int rate)
     {
-        _TCables = GetComponentsInChildren<ITCable>();
-        
-        if(direct == Direct.Rewind)
-          bRewinding = true;
-        bInArea = true;
-        _bPrepareFinishRewind = false;
-        offsetRewindSec = 0f;
-        _rate = rate;
+        foreach (var tCable in _TCables)
+            if (direct == Direct.Rewind)
+                tCable.Rewind(rate);
+            else
+                tCable.Forward(rate);
 
+        _rate = rate;
         //当前播放的需要加速
         if (direct == Direct.Forward)
         {
-            if(wuqiEffect.gameObject.activeInHierarchy)
+            if (wuqiEffect.gameObject.activeInHierarchy)
             {
-                ParticleSystem[] ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
-                foreach (ParticleSystem particleSystem in ps)
+                var ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
+                foreach (var particleSystem in ps)
                 {
                     var main = particleSystem.main;
                     main.simulationSpeed = rate;
                 }
             }
-            
+
             foreach (AnimationState state in anim)
-            {
                 if (anim.IsPlaying(state.name))
                 {
                     anim[state.name].speed = rate;
-                    
+
                     StopAllCoroutines();
-                    StartCoroutine(PlayNextAfter((state.length - state.time % state.length)/_rate));
+                    StartCoroutine(PlayNextAfter((state.length - state.time % state.length) / rate));
                 }
-            }
+        }
+        else
+        {
+            StopAllCoroutines();
+            anim.Stop();
+            bUpdateTRS = false;
         }
     }
 
     public void OnStayInTCArea(float deltaTime)
     {
-        offsetRewindSec+=deltaTime * _rate;
     }
 
     public void OnExitTCArea(Direct direct)
     {
-        _bPrepareFinishRewind = true;
-        offsetRewindSec = 0f;
         _rate = 1;
-        
+        foreach (var tCable in _TCables) tCable.FinishTimeControl();
+
         //当前播放的需要加速
         if (direct == Direct.Forward)
         {
-            if(wuqiEffect.gameObject.activeInHierarchy)
+            if (wuqiEffect.gameObject.activeInHierarchy)
             {
-                ParticleSystem[] ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
-                foreach (ParticleSystem particleSystem in ps)
+                var ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
+                foreach (var particleSystem in ps)
                 {
                     var main = particleSystem.main;
                     main.simulationSpeed = 1;
                 }
             }
-            
+
             foreach (AnimationState state in anim)
-            {
                 if (anim.IsPlaying(state.name))
                 {
                     anim[state.name].speed = 1;
-                    
+
                     StopAllCoroutines();
-                    StartCoroutine(PlayNextAfter((state.length - state.time % state.length)/_rate));
+                    StartCoroutine(PlayNextAfter((state.length - state.time % state.length) / _rate));
                 }
-            }
         }
-    }
-    
-    private void FixedUpdate()
-    {
-        if (!bInArea || _TCables == null) return;
-        
-        if (_bPrepareFinishRewind)
-        {
-            _bPrepareFinishRewind = false;
-            bRewinding = false;
-            bInArea = false;
-
-            foreach (ITCable tCable in _TCables)
-            {
-                tCable.FinishRewind();
-            }
-        }
-
-        if (bRewinding)
-            foreach (ITCable tCable in _TCables)
-            {
-                tCable.Rewind(offsetRewindSec, 1f);
-               // Debug.Log(offsetRewindSec);
-            }
         else
-            foreach (ITCable tCable in _TCables)
-            {
-                tCable.Forward(_rate);
-            }
+        {
+            foreach (AnimationState state in anim)
+                if (anim.IsPlaying(state.name))
+                {
+                    anim[state.name].speed = 1;
+                    PlayRandomAnimation(state.name, state.time);
+                }
+
+            bUpdateTRS = true;
+        }
     }
+
     #endregion
 }

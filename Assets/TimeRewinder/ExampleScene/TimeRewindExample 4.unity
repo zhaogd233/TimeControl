@@ -1314,7 +1314,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a1efdd4341e4d6b9c2f2abdc8d553f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TrackTime: 12
+  TrackTime: 10
 --- !u!1 &1107567297 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 170483922022495543, guid: 0fb06aceffb6a294c8971e56e984b534, type: 3}
@@ -1812,6 +1812,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bDebug: 0
+  bDestory: 0
   TCDirect: 0
 --- !u!114 &4074200075508992423
 MonoBehaviour:
@@ -1826,6 +1827,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bDebug: 0
+  bDestory: 0
   TCDirect: 0
 --- !u!136 &4074200075508992425
 CapsuleCollider:
@@ -1863,6 +1865,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bDebug: 0
+  bDestory: 0
   TCDirect: 0
   target: {fileID: 708519431}
 --- !u!1001 &6303442898921414860

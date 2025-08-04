@@ -45,7 +45,8 @@ namespace TVA
             var particles = new ParticleTrackedData[_particleSystems.Length];
             for (var i = 0; i < _particleSystems.Length; i++)
             {
-                particles[i].isPlaying = _particleSystems[i].isPlaying && _particleSystems[i].gameObject.activeInHierarchy;
+                particles[i].isPlaying =
+                    _particleSystems[i].isPlaying && _particleSystems[i].gameObject.activeInHierarchy;
 
                 if (_particleSystems[i].isPlaying)
                     _particleTimes[i] += Time.fixedDeltaTime;
@@ -72,7 +73,7 @@ namespace TVA
                     _particleSystems[i].Simulate(particleTracked.particleTime, false, true, false);
             }
         }
-
+        
         protected override void FinishRewindAction(ParticleFrameData rewindValue)
         {
             if (_particleSystems.Length == 0 || rewindValue.particles == null ||
@@ -86,10 +87,13 @@ namespace TVA
             {
                 var particleTracked = rewindValue.particles[i];
                 if (particleTracked.isPlaying)
+                {
+                    var main = _particleSystems[i].main;
+                    main.simulationSpeed = 1;
                     _particleSystems[i].Play();
+                }
             }
         }
-
 
         protected override void DestoryCompelety()
         {

@@ -41,13 +41,15 @@ namespace TVA
                 _bPrepareFinishRewind = false;
                 bRewinding = false;
 
-                _TCables.ForEach(x => x.FinishRewind());
+                _TCables.ForEach(x => x.FinishTimeControl());
             }
 
-            if (bRewinding)
+            /*if (bRewinding)
                 _TCables.ForEach(x => x.Rewind(rewindSeconds, 1f));
             else
-                _TCables.ForEach(x => x.Forward(1));
+                _TCables.ForEach(x => x.Forward(1));*/
+
+            foreach (var tCable in _TCables) tCable.FixedTick(Time.fixedDeltaTime);
         }
 
         public void StartRewindTimeBySeconds(float seconds)

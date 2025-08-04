@@ -19,14 +19,7 @@ namespace TVA
             anim = GetComponent<Animation>();
         }
 
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) anim.Play("Attack_1");
-            if (Input.GetKeyDown(KeyCode.Alpha2)) anim.Play("Attack_2");
-            if (Input.GetKeyDown(KeyCode.Alpha3)) anim.Play("Skill_Huixuanzhan");
-            if (Input.GetKeyDown(KeyCode.Alpha4)) anim.Play("Skill_Chuanci_Loop");
-        }
-
+    
         protected override void InitTCObj()
         {
             Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime);
@@ -76,7 +69,7 @@ namespace TVA
 
         protected override void FinishRewindAction(LegacyAnimationTrackedData rewindValue)
         {
-            /*if (!string.IsNullOrEmpty(rewindValue.clipName))
+            if (!string.IsNullOrEmpty(rewindValue.clipName))
             {
                 // 获取目标剪辑的 state
                 var state = anim[rewindValue.clipName];
@@ -86,7 +79,7 @@ namespace TVA
                 // 强制把播放时间设置到你想要 rewind 到的 time
                 state.time = rewindValue.time;
                 anim.Play(rewindValue.clipName);
-            }*/
+            }
         }
 
         protected override void DestoryCompelety()
