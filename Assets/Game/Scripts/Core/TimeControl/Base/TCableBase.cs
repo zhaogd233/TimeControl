@@ -28,7 +28,7 @@ namespace TVA
         private float _maxSecond;
         private TVRingBuffer<T> _recordbuffer;
 
-        public Action DestoryCompeletyAction;
+        private Action DestoryCompeletyAction;
         private int forwardRate = 1;
         private int rewindRate = 1;
         public bool IsDestorying { private set; get; } //标记已被逻辑销毁，但可能会回溯出来
@@ -110,9 +110,10 @@ namespace TVA
             if (TCDirect == Direct.Rewind)
             {
                 TCDirect = Direct.Forward;
-                
+
                 //回溯结束，通知上层逻辑继续执行逻辑运算
-                if (!IsDestorying && TryGetRecordValue(_lastRewindSeconds, out var valuesToRead)) FinishRewindAction(valuesToRead);
+                if (!IsDestorying && TryGetRecordValue(_lastRewindSeconds, out var valuesToRead))
+                    FinishRewindAction(valuesToRead);
                 _recordbuffer.MoveLastBufferPos(_lastRewindSeconds);
                 _escapeTime -= _lastRewindSeconds;
                 _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
@@ -135,15 +136,14 @@ namespace TVA
             var countPerSec = (int)(1.0f / updateDelta);
             _recordbuffer = new TVRingBuffer<T>(maxSecond * countPerSec, countPerSec);
             TCManager.Instance.AddObjectForTracking(this);
-            
-            Debug.LogWarning("+ "+GetInstanceID());
         }
 
         /// <summary>
         ///     销毁的时候，先disable,等过了记录周期之后，才彻底销毁
         /// </summary>
-        public void OnDestroy()
+        public void FakeDestroy(Action OnComplete = null)
         {
+            DestoryCompeletyAction = OnComplete;
             IsDestorying = true;
             _destoryTime = 0;
         }
@@ -153,7 +153,7 @@ namespace TVA
         ///     只有从没有的数据开始播，才算记录，旧的加速还是回溯。
         ///     rate 倍速要写多份
         /// </summary>
-        public void ForwardInternal(float delaTime)
+        private void ForwardInternal(float delaTime)
         {
             _escapeTime += delaTime * forwardRate;
             _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
@@ -163,7 +163,7 @@ namespace TVA
             // TrackAction(rate);
         }
 
-        public void RewindInternal(float deltaTime)
+        private void RewindInternal(float deltaTime)
         {
             var offsetRewindSeconds = _lastRewindSeconds + deltaTime * rewindRate;
             if (offsetRewindSeconds < 0 || offsetRewindSeconds > _escapeTime)
@@ -219,7 +219,7 @@ namespace TVA
 
             if (DestoryCompeletyAction != null)
                 DestoryCompeletyAction();
-            
+
             _recordbuffer.Clear();
         }
 

@@ -4,7 +4,10 @@ using TVA;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class NpcController : MonoBehaviour, IAreaEntityListener
+/// <summary>
+/// 测试用的npc ,ai 是随机模拟
+/// </summary>
+public class NpcController : ATCActor
 {
     [Header("Animation 组件")] public Animation anim;
 
@@ -21,9 +24,7 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
     public TextMeshPro TimeTMP;
 
     //隐藏实体，但保留碰撞和ui
-    public GameObject actor;
-
-    private bool bDestroyed = false;
+    public GameObject bullet;
 
     private readonly string[] animationNames = new string[11]
     {
@@ -40,7 +41,9 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
         "Attack_2"
     };
 
+    //debug 显示用的
     private AnimationTCable _animationTCable;
+    private Camera _camera;
 
     private bool bUpdateTRS;
     private bool isRunning;
@@ -48,19 +51,20 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
     // 平滑转向目标
     private Quaternion targetRotation;
 
+
     private void Awake()
     {
         _camera = Camera.main;
     }
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+
         if (anim == null)
             anim = GetComponentInChildren<Animation>();
-        _TCables = GetComponentsInChildren<ITCable>();
 
         _animationTCable = GetComponentInChildren<AnimationTCable>();
-        _animationTCable.DestoryCompeletyAction = OnDestroyImmediately;
         targetRotation = transform.rotation;
         bUpdateTRS = true;
         PlayRandomAnimation();
@@ -72,12 +76,12 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
             return;
         // 平滑旋转
         transform.rotation =
-            Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime * _rate);
+            Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime * actorRate);
 
         if (isRunning)
         {
             // 持续向前移动
-            transform.position += transform.forward * runSpeed * Time.deltaTime * _rate;
+            transform.position += transform.forward * runSpeed * Time.deltaTime * actorRate;
             var needTurn = false;
 
             // 如果出界 → 掉头
@@ -95,6 +99,9 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
         }
     }
 
+    #region Debug 显示
+
+    
     private void LateUpdate()
     {
         if (_camera != null && TimeTMP != null)
@@ -124,6 +131,11 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
         }
     }
 
+    #endregion
+
+    #region 简单AI
+
+    
     private void PlayRandomAnimation(string lastClip = "", float leftTime = 0f)
     {
         StopAllCoroutines();
@@ -160,19 +172,20 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
         if (_animationTCable != null && _animationTCable.TCDirect == Direct.Forward)
         {
             anim.Play(clipName);
-            state.speed = _rate;
+            state.speed = actorRate;
         }
 
         // 如果是 skill 动画，则播放特效
         if (clipName.Contains("Skill_Huixuanzhan") && wuqiEffect != null)
             //   wuqiEffect.Play();
         {
+            StartCoroutine(TryFireBullets());
             wuqiEffect.gameObject.SetActive(true);
             var ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
             foreach (var particleSystem in ps)
             {
                 var main = particleSystem.main;
-                main.simulationSpeed = _rate;
+                main.simulationSpeed = actorRate;
             }
         }
 
@@ -183,10 +196,10 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
         }
 
         if (clipName.Equals("Attack_2") && Time.realtimeSinceStartup > 10)
-            TryDestory();
+            DestroyActor();
         else
             // 延迟到动画结束时调用下一次
-            StartCoroutine(PlayNextAfter((state.length - state.time % state.length) / _rate));
+            StartCoroutine(PlayNextAfter((state.length - state.time % state.length) / actorRate));
     }
 
     private IEnumerator PlayNextAfter(float delay)
@@ -195,111 +208,99 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
         PlayRandomAnimation();
     }
 
-    private void TryDestory()
+    private IEnumerator TryFireBullets()
     {
-        StopAllCoroutines();
-        actor.SetActive(false);
-        foreach (var tCable in _TCables) tCable.OnDestroy();
-    }
-
-    private void OnDestroyImmediately()
-    {
-        bDestroyed = true;
-        DestroyImmediate(gameObject);
-    }
-
-    #region 受到操控区域的作用
-
-    private ITCable[] _TCables;
-    private Camera _camera;
-    private int _rate = 1;
-
-    public void OnEnterTCArea(Direct direct, int rate)
-    {
-        if (bDestroyed)
-            return;
-        
-        foreach (var tCable in _TCables)
-            if (direct == Direct.Rewind)
-                tCable.Rewind(rate);
-            else
-                tCable.Forward(rate);
-
-        _rate = rate;
-        //当前播放的需要加速
-        if (direct == Direct.Forward)
+        for (var i = 0; i < 10; i++)
         {
-            if (wuqiEffect.gameObject.activeInHierarchy)
-            {
-                var ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
-                foreach (var particleSystem in ps)
-                {
-                    var main = particleSystem.main;
-                    main.simulationSpeed = rate;
-                }
-            }
-
-            foreach (AnimationState state in anim)
-                if (anim.IsPlaying(state.name))
-                {
-                    anim[state.name].speed = rate;
-
-                    StopAllCoroutines();
-                    StartCoroutine(PlayNextAfter((state.length - state.time % state.length) / rate));
-                }
-        }
-        else
-        {
-            if(gameObject.activeInHierarchy)
-                StopAllCoroutines();
-            anim.Stop();
-            bUpdateTRS = false;
+            FireBullet();
+            yield return new WaitForSeconds(0.3f);
         }
     }
 
-
-    public void OnExitTCArea(Direct direct)
+    private void FireBullet()
     {
-        if (bDestroyed)
-            return;
-
-        _rate = 1;
-        foreach (var tCable in _TCables) tCable.FinishTimeControl();
-
-        //当前播放的需要加速
-        if (direct == Direct.Forward)
+        if (bullet != null && wuqiEffect != null)
         {
-            if (wuqiEffect.gameObject.activeInHierarchy)
-            {
-                var ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
-                foreach (var particleSystem in ps)
-                {
-                    var main = particleSystem.main;
-                    main.simulationSpeed = 1;
-                }
-            }
-
-            foreach (AnimationState state in anim)
-                if (anim.IsPlaying(state.name))
-                {
-                    anim[state.name].speed = 1;
-
-                    StopAllCoroutines();
-                    StartCoroutine(PlayNextAfter((state.length - state.time % state.length) / _rate));
-                }
-        }
-        else
-        {
-            foreach (AnimationState state in anim)
-                if (anim.IsPlaying(state.name))
-                {
-                    anim[state.name].speed = 1;
-                    PlayRandomAnimation(state.name, state.time);
-                }
-
-            bUpdateTRS = true;
+            var bulletIns = Instantiate(bullet, wuqiEffect.position, wuqiEffect.rotation);
+            var rb = bulletIns.GetComponent<bullet>();
+            if (rb != null) rb.velocity = wuqiEffect.forward; // 发射速度
         }
     }
 
     #endregion
+    
+    #region 子类实现关键接口
+
+    
+    protected override void StopAllActions()
+    {
+        StopAllCoroutines();
+    }
+
+    protected override void BeforeAccelerateAction()
+    {
+        if (wuqiEffect.gameObject.activeInHierarchy)
+        {
+            var ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
+            foreach (var particleSystem in ps)
+            {
+                var main = particleSystem.main;
+                main.simulationSpeed = actorRate;
+            }
+        }
+
+        foreach (AnimationState state in anim)
+            if (anim.IsPlaying(state.name))
+            {
+                anim[state.name].speed = actorRate;
+
+                StopAllCoroutines();
+                StartCoroutine(PlayNextAfter((state.length - state.time % state.length) / actorRate));
+            }
+    }
+
+    protected override void AfterAccelerateAction()
+    {
+        if (wuqiEffect.gameObject.activeInHierarchy)
+        {
+            var ps = wuqiEffect.GetComponentsInChildren<ParticleSystem>();
+            foreach (var particleSystem in ps)
+            {
+                var main = particleSystem.main;
+                main.simulationSpeed = 1;
+            }
+        }
+
+        foreach (AnimationState state in anim)
+            if (anim.IsPlaying(state.name))
+            {
+                anim[state.name].speed = 1;
+
+                StopAllCoroutines();
+                StartCoroutine(PlayNextAfter((state.length - state.time % state.length) / actorRate));
+            }
+    }
+
+    protected override void BeforeRewindAction()
+    {
+        if (gameObject.activeInHierarchy)
+            StopAllCoroutines();
+        anim.Stop();
+        bUpdateTRS = false;
+    }
+
+    protected override void AfterRewindAction()
+    {
+        foreach (AnimationState state in anim)
+            if (anim.IsPlaying(state.name))
+            {
+                anim[state.name].speed = 1;
+                PlayRandomAnimation(state.name, state.time);
+            }
+
+        bUpdateTRS = true;
+    }
+
+    #endregion
+    
 }

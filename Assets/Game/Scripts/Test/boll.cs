@@ -38,8 +38,8 @@ public class Ball : MonoBehaviour
         overlappingBalls.Clear();
 
         foreach (var entity in npcsInside)
-            if(entity != null)
-              entity.OnExitTCArea(direct);
+            if (entity != null)
+                entity.OnExitTCArea(direct);
 
         beginTC = false;
     }

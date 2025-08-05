@@ -1,3 +1,5 @@
+using System;
+
 namespace TVA
 {
     public interface ITCable
@@ -36,9 +38,10 @@ namespace TVA
         void FixedTick(float deltaTime);
 
         /// <summary>
-        ///     销毁先隐藏，等过了记录周期之后，才彻底销毁
+        ///     销毁先隐藏，等过了记录周期之后，
         /// </summary>
-        void OnDestroy();
+        /// <param name="onComplete">注册彻底销毁时的回调</param>
+        void FakeDestroy(Action onComplete = null);
 
         #endregion
     }
