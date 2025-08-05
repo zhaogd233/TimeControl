@@ -1,7 +1,6 @@
 using System.Collections;
 using TMPro;
 using TVA;
-using Unity.Properties;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -20,9 +19,11 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
     public Transform wuqiEffect;
 
     public TextMeshPro TimeTMP;
-    
+
     //隐藏实体，但保留碰撞和ui
     public GameObject actor;
+
+    private bool bDestroyed = false;
 
     private readonly string[] animationNames = new string[11]
     {
@@ -109,7 +110,9 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
                 TimeTMP.text = $"dead:{_animationTCable.GetDestroyingTime():F1}s";
                 TimeTMP.color = Color.black;
                 return;
-            };
+            }
+
+            ;
             if (recordTime <= 0)
                 TimeTMP.color = Color.red;
             else if (_animationTCable.TCDirect == Direct.Rewind)
@@ -179,11 +182,11 @@ public class NpcController : MonoBehaviour, IAreaEntityListener
             wuqiEffect.gameObject.SetActive(false);
         }
 
-        if (clipName.Equals("Attack_2")) 
+        if (clipName.Equals("Attack_2") && Time.realtimeSinceStartup > 10)
             TryDestory();
-else
-        // 延迟到动画结束时调用下一次
-        StartCoroutine(PlayNextAfter((state.length - state.time % state.length) / _rate));
+        else
+            // 延迟到动画结束时调用下一次
+            StartCoroutine(PlayNextAfter((state.length - state.time % state.length) / _rate));
     }
 
     private IEnumerator PlayNextAfter(float delay)
@@ -198,10 +201,11 @@ else
         actor.SetActive(false);
         foreach (var tCable in _TCables) tCable.OnDestroy();
     }
-    
+
     private void OnDestroyImmediately()
     {
-        Destroy(gameObject);
+        bDestroyed = true;
+        DestroyImmediate(gameObject);
     }
 
     #region 受到操控区域的作用
@@ -212,6 +216,9 @@ else
 
     public void OnEnterTCArea(Direct direct, int rate)
     {
+        if (bDestroyed)
+            return;
+        
         foreach (var tCable in _TCables)
             if (direct == Direct.Rewind)
                 tCable.Rewind(rate);
@@ -243,18 +250,19 @@ else
         }
         else
         {
-            StopAllCoroutines();
+            if(gameObject.activeInHierarchy)
+                StopAllCoroutines();
             anim.Stop();
             bUpdateTRS = false;
         }
     }
 
-    public void OnStayInTCArea(float deltaTime)
-    {
-    }
 
     public void OnExitTCArea(Direct direct)
     {
+        if (bDestroyed)
+            return;
+
         _rate = 1;
         foreach (var tCable in _TCables) tCable.FinishTimeControl();
 

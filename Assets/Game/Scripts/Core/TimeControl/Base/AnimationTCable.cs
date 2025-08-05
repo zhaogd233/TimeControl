@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace TVA
@@ -19,7 +18,7 @@ namespace TVA
             anim = GetComponent<Animation>();
         }
 
-    
+
         protected override void InitTCObj()
         {
             Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime);
@@ -81,6 +80,5 @@ namespace TVA
                 anim.Play(rewindValue.clipName);
             }
         }
-
     }
 }

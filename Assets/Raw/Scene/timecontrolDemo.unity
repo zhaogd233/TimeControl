@@ -1410,7 +1410,6 @@ GameObject:
   - component: {fileID: 1754590048}
   - component: {fileID: 1754590047}
   - component: {fileID: 1754590046}
-  - component: {fileID: 1754590045}
   - component: {fileID: 1754590044}
   m_Layer: 0
   m_Name: BouncePlane (1)
@@ -1456,19 +1455,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 10, y: 2.220446e-16, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1754590045
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1754590042}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67a88f50827762e4cb9d5c065ce40f41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  jumpForce: 17
 --- !u!64 &1754590046
 MeshCollider:
   m_ObjectHideFlags: 0

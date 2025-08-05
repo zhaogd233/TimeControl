@@ -26,7 +26,6 @@ namespace TVA
 
         protected override void FinishRewindAction(TransformValues rewindValue)
         {
-            
         }
 
         protected override TransformValues GetCurTrackData(float rate)

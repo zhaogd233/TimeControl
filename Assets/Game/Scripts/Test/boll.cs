@@ -9,12 +9,12 @@ public class Ball : MonoBehaviour
     public Direct direct;
 
     public LayerMask npcLayer; // 只检测 NPC 层
+    private readonly List<Ball> overlappingBalls = new();
     private bool beginTC;
     private float checkRadius;
 
     public HashSet<IAreaEntityListener> npcsInside = new();
     private int overlapCount;
-    private readonly List<Ball> overlappingBalls = new();
     private Renderer rend;
 
     private void Awake()
@@ -29,13 +29,6 @@ public class Ball : MonoBehaviour
         checkRadius = GetSphereColliderRadius();
     }
 
-    private void Update()
-    {
-        if (!beginTC)
-            return;
-        foreach (var entity in npcsInside) entity.OnStayInTCArea(Time.deltaTime);
-    }
-
     private void OnDestroy()
     {
         // 通知所有重叠的球：“我走了”
@@ -44,7 +37,9 @@ public class Ball : MonoBehaviour
                 otherBall.NotifyBallRemoved(this);
         overlappingBalls.Clear();
 
-        foreach (var entity in npcsInside) entity.OnExitTCArea(direct);
+        foreach (var entity in npcsInside)
+            if(entity != null)
+              entity.OnExitTCArea(direct);
 
         beginTC = false;
     }

@@ -1,24 +1,24 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace TVA
 {
     public enum Direct
     {
         Forward, //正向
-        Rewind //回溯
+        Rewind, //回溯
+        FinishForward //操控结束开始正向
     }
 
     public abstract class TCableBase<T> : MonoBehaviour, ITCable
     {
         public bool bDebug;
-        public bool IsDestorying { private set; get; } //标记已被逻辑销毁，但可能会回溯出来
-        [HideInInspector]
-         public Direct TCDirect = Direct.Forward;
+
+        [HideInInspector] public Direct TCDirect = Direct.Forward;
+
+        private float _destoryTime;
 
         private float _escapeTime;
-        private float _destoryTime;
 
         /// <summary>
         ///     已回溯时间
@@ -27,10 +27,11 @@ namespace TVA
 
         private float _maxSecond;
         private TVRingBuffer<T> _recordbuffer;
-        private int forwardRate = 1;
-        private int rewindRate = 1;
 
         public Action DestoryCompeletyAction;
+        private int forwardRate = 1;
+        private int rewindRate = 1;
+        public bool IsDestorying { private set; get; } //标记已被逻辑销毁，但可能会回溯出来
 
         protected virtual void Start()
         {
@@ -40,32 +41,42 @@ namespace TVA
 
         public void FixedTick(float deltaTime)
         {
+            /*if (TCDirect == Direct.FinishForward)
+            {
+                FinishTimeControlInternal();
+            }*/
             if (TCDirect == Direct.Forward)
             {
                 if (IsDestorying)
                 {
-                    if(_destoryTime > _maxSecond)
+                    if (_destoryTime > _maxSecond)
                         DestoryCompeletyInternal();
                     else
-                    {
                         _destoryTime += deltaTime * forwardRate;
-                    }
-                }else
-                 ForwardInternal(deltaTime);
+                }
+                else
+                {
+                    ForwardInternal(deltaTime);
+                }
             }
             else
             {
                 if (IsDestorying)
                 {
-                    if(_destoryTime > 0)
+                    if (_destoryTime > 0)
+                    {
                         _destoryTime -= deltaTime * rewindRate;
+                    }
                     else
                     {
                         IsDestorying = false;
                         _destoryTime = 0;
                     }
-                }else
+                }
+                else
+                {
                     RewindInternal(deltaTime);
+                }
             }
         }
 
@@ -99,11 +110,9 @@ namespace TVA
             if (TCDirect == Direct.Rewind)
             {
                 TCDirect = Direct.Forward;
+                
                 //回溯结束，通知上层逻辑继续执行逻辑运算
-                if (TryGetRecordValue(_lastRewindSeconds, out var valuesToRead))
-                {
-                    FinishRewindAction(valuesToRead);
-                }
+                if (!IsDestorying && TryGetRecordValue(_lastRewindSeconds, out var valuesToRead)) FinishRewindAction(valuesToRead);
                 _recordbuffer.MoveLastBufferPos(_lastRewindSeconds);
                 _escapeTime -= _lastRewindSeconds;
                 _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
@@ -126,6 +135,8 @@ namespace TVA
             var countPerSec = (int)(1.0f / updateDelta);
             _recordbuffer = new TVRingBuffer<T>(maxSecond * countPerSec, countPerSec);
             TCManager.Instance.AddObjectForTracking(this);
+            
+            Debug.LogWarning("+ "+GetInstanceID());
         }
 
         /// <summary>
@@ -204,11 +215,12 @@ namespace TVA
                 return;
             }
 
-            _recordbuffer.Clear();
             TCManager.Instance.RemoveObjectForTracking(this);
+
+            if (DestoryCompeletyAction != null)
+                DestoryCompeletyAction();
             
-            if(DestoryCompeletyAction != null)
-              DestoryCompeletyAction();
+            _recordbuffer.Clear();
         }
 
         public void SetDebug(bool b)
@@ -253,9 +265,9 @@ namespace TVA
         /// </summary>
         /// <param name="curValue"></param>
         protected abstract void RewindAction(T curValue);
-        
+
         /// <summary>
-        /// 通知上层最后rewind的状态
+        ///     通知上层最后rewind的状态
         /// </summary>
         /// <param name="rewindValue"></param>
         protected abstract void FinishRewindAction(T rewindValue);

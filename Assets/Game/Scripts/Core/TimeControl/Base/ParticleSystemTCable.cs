@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace TVA
@@ -73,7 +72,7 @@ namespace TVA
                     _particleSystems[i].Simulate(particleTracked.particleTime, false, true, false);
             }
         }
-        
+
         protected override void FinishRewindAction(ParticleFrameData rewindValue)
         {
             if (_particleSystems.Length == 0 || rewindValue.particles == null ||
