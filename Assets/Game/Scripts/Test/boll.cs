@@ -6,6 +6,11 @@ public class Ball : MonoBehaviour
 {
     public Color normalColor = Color.white;
     public Color overlapColor = Color.red;
+    
+    /// <summary>
+    /// 回溯圈的单位离开之后还能继续回溯。
+    /// 加速圈的单位离开之后就不能继续加速
+    /// </summary>
     public Direct direct;
 
     public LayerMask npcLayer; // 只检测 NPC 层
@@ -69,10 +74,13 @@ public class Ball : MonoBehaviour
             var entity = other.gameObject.GetComponent<IAreaEntityListener>();
             if (entity != null)
             {
-                if(!npcsInside.Contains(entity))
-                npcsInside.Add(entity);
-                if(beginTC)
-                    entity.OnEnterTCArea(direct,areaRate);
+                if(direct == Direct.Forward)
+                {
+                    if (!npcsInside.Contains(entity))
+                        npcsInside.Add(entity);
+                    if (beginTC)
+                        entity.OnEnterTCArea(direct, areaRate);
+                }
             }
                 
         }
@@ -91,7 +99,7 @@ public class Ball : MonoBehaviour
             }
         }
 
-        if (other.gameObject.layer == LayerMask.NameToLayer("NPC"))
+        if (other.gameObject.layer == LayerMask.NameToLayer("NPC") && direct == Direct.Forward)
         {
             var entity = other.gameObject.GetComponent<IAreaEntityListener>();
             if (entity != null)

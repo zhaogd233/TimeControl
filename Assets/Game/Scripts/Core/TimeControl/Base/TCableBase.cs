@@ -26,6 +26,14 @@ namespace TVA
         private float _lastRewindSeconds;
 
         private float _maxSecond;
+
+        #region 记录优化，根据倍速记录，只记录需要播放的帧数据
+
+        private int _maxRate = 1;
+        private int _lastRecordCount = 0;
+
+        #endregion
+        
         private TVRingBuffer<T> _recordbuffer;
 
         private Action DestoryCompeletyAction;
@@ -86,6 +94,7 @@ namespace TVA
         {
             TCDirect = Direct.Forward;
             forwardRate = Mathf.Max(rate, forwardRate);
+            _lastRecordCount = 0;
         }
 
         /// <summary>
@@ -133,11 +142,12 @@ namespace TVA
         /// <summary>
         ///     初始化存储数据
         /// </summary>
-        public void Initialized(int maxSecond, float updateDelta)
+        public void Initialized(int maxSecond, float updateDelta,int maxRate)
         {
             _maxSecond = maxSecond;
+            _maxRate = maxRate;
             var countPerSec = (int)(1.0f / updateDelta);
-            _recordbuffer = new TVRingBuffer<T>(maxSecond * countPerSec, countPerSec);
+            _recordbuffer = new TVRingBuffer<T>(maxSecond * countPerSec / maxRate, countPerSec,maxRate );
             TCManager.Instance.AddObjectForTracking(this);
         }
 
@@ -168,7 +178,21 @@ namespace TVA
             _escapeTime += delaTime * forwardRate;
             _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
             var value = GetCurTrackData(forwardRate);
-            for (var i = 0; i < forwardRate; i++) RecordValue(value);
+            
+            //只记录需要播放帧的数据
+            if(forwardRate > 1)
+                RecordValue(value);
+            else
+            {
+                if (_lastRecordCount == 0)
+                {
+                    RecordValue(value);
+                }
+                    _lastRecordCount++;
+                if (_lastRecordCount >= _maxRate)
+                    _lastRecordCount = 0;
+            }
+           // for (var i = 0; i < forwardRate; i++) RecordValue(value);
             //判断是否超过已经最大记录，如果
             // TrackAction(rate);
         }
@@ -208,7 +232,8 @@ namespace TVA
                 Debug.LogError("尚未调用Initialized");
                 return;
             }
-
+            if(bDebug)
+Debug.LogError(Time.frameCount);
             _recordbuffer.RecordValue(value);
         }
 

@@ -10,13 +10,15 @@ namespace TVA
     {
         private readonly int _capacity;
         private readonly int _countPerSec;
+        private float _maxRate;
         private bool _bDebug;
         private T[] _buffer;
         private int _curPos = -1;
 
-        public TVRingBuffer(int capacity, int countPerSec)
+        public TVRingBuffer(int capacity, int countPerSec,int maxRate)
         {
             _capacity = capacity;
+            _maxRate = maxRate;
             _countPerSec = countPerSec;
             _buffer = new T[_capacity];
         }
@@ -46,7 +48,7 @@ namespace TVA
 
         private int CalculateIndex(float seconds)
         {
-            var howManyBeforeLast = (int)(_countPerSec * (seconds - 0.001));
+            var howManyBeforeLast = (int)(_countPerSec * (seconds - 0.001) / _maxRate);
             var moveBy = _curPos - howManyBeforeLast;
 
             if (moveBy < 0) return _capacity + moveBy;

@@ -6,6 +6,7 @@ namespace TVA
     public class TCManager : MonoBehaviour
     {
         [SerializeField] public int TrackTime;
+        [SerializeField] public int MaxRate = 2;
         private List<ITCable> _AddCables; // 时间可操控对象
         private List<ITCable> _DelCables; // 时间可操控对象
 

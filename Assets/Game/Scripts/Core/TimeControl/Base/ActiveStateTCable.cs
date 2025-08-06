@@ -7,7 +7,7 @@ public class ActiveStateTCable : TCableBase<bool>
 
     protected override void InitTCObj()
     {
-        Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime);
+        Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime,TCManager.Instance.MaxRate);
     }
 
     protected override bool GetCurTrackData(float rate)

@@ -21,7 +21,7 @@ namespace TVA
 
         protected override void InitTCObj()
         {
-            Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime);
+            Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime,TCManager.Instance.MaxRate);
             //  SetDebug(true);
         }
 

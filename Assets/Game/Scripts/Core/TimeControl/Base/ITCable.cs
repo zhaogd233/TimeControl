@@ -32,7 +32,7 @@ namespace TVA
 
         #region 生命周期，对外暴漏的可调用接口
 
-        void Initialized(int maxSecond, float updateDelta);
+        void Initialized(int maxSecond, float updateDelta,int maxRate);
 
         /*void OnEnable();
         void OnDisable();*/
