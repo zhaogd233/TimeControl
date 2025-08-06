@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace TVA
 {
@@ -19,7 +20,8 @@ namespace TVA
         /// </summary>
         /// <param name="偏移回溯0代表没回溯 ">♾️->0</param>
         /// <param name="rate"></param>
-        void Rewind(int rate);
+        /// <param name="rewindHeadRecordAction">rewind 到记录头，可能还是rewind结束，比如子弹记录了3s,0saction就应该销毁</param>
+        void Rewind(int rate,Action rewindHeadRecordAction);
 
         /// <summary>
         ///     时间操控结束
@@ -42,6 +44,11 @@ namespace TVA
         /// </summary>
         /// <param name="onComplete">注册彻底销毁时的回调</param>
         void FakeDestroy(Action onComplete = null);
+        
+        /// <summary>
+        /// 直接销毁不记录数据用于回溯
+        /// </summary>
+        void DestroyImmediate(Action onComplete = null);
 
         #endregion
     }

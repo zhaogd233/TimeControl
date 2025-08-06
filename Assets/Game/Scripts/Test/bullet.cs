@@ -3,7 +3,7 @@ using TMPro;
 using TVA;
 using UnityEngine;
 
-public class bullet : MonoBehaviour, IAreaEntityListener
+public class bullet : ATCActor
 {
     [HideInInspector] public Vector3 velocity;
 
@@ -14,27 +14,37 @@ public class bullet : MonoBehaviour, IAreaEntityListener
     private Camera _camera;
 
     private float _escapeTime;
-
-    private int _rate = 1;
+    private float _deadTime;
 
     private bool bUpdateSelf = true;
+    private bool bRewindSelf = false;
+    private bool bDestroySelf = false;
 
     private TransformTCable transformTCable;
 
     // Start is called before the first frame update
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         _camera = Camera.main;
         transformTCable = GetComponent<TransformTCable>();
-        StartCoroutine(DelayDestroy());
     }
 
     private void Update()
     {
         if (bUpdateSelf)
         {
-            _escapeTime += Time.deltaTime;
-            transform.position += velocity * speed * Time.deltaTime * _rate;
+            _escapeTime += Time.deltaTime * actorRate;
+            transform.position += velocity * speed * Time.deltaTime * actorRate;
+            
+            if(_escapeTime >= LifeTime)
+                DestroyActor();
+        }
+        else if (bRewindSelf)
+        {
+            //死亡回溯，不处理飞行时长
+            if(!transformTCable.IsDestorying)
+              _escapeTime -= Time.deltaTime * actorRate;
         }
     }
 
@@ -55,7 +65,6 @@ public class bullet : MonoBehaviour, IAreaEntityListener
                 return;
             }
 
-            ;
             if (recordTime <= 0)
                 TimeTMP.color = Color.red;
             else if (transformTCable.TCDirect == Direct.Rewind)
@@ -67,31 +76,39 @@ public class bullet : MonoBehaviour, IAreaEntityListener
         }
     }
 
-    public void OnEnterTCArea(Direct direct, int rate)
+    protected override void StopAllActions()
     {
-        StopAllCoroutines();
-        if (direct == Direct.Rewind)
-        {
-            bUpdateSelf = false;
-        }
-        else
-        {
-            bUpdateSelf = true;
-            _rate = rate;
-        }
+        bUpdateSelf = false;
     }
 
-    public void OnExitTCArea(Direct direct)
+    protected override void BeforeAccelerateAction()
     {
-        StopAllCoroutines();
         bUpdateSelf = true;
-        _rate = 1;
     }
 
-    // Update is called once per frame
-    private IEnumerator DelayDestroy()
+    protected override void AfterAccelerateAction()
     {
-        yield return new WaitForSeconds(LifeTime);
-        Destroy(gameObject);
+        bUpdateSelf = true;
+    }
+
+    protected override void BeforeRewindAction()
+    {
+        bUpdateSelf = false;
+        bRewindSelf = true;
+    }
+
+    protected override void AfterRewindAction()
+    {
+        bUpdateSelf = true;
+        bRewindSelf = false;
+    }
+
+    /// <summary>
+    /// 创建的子弹直接销毁
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    protected override void OnRewindHeadRecord()
+    {
+        DestroyImmedeletyActor();
     }
 }

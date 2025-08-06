@@ -223,7 +223,11 @@ public class NpcController : ATCActor
         {
             var bulletIns = Instantiate(bullet, wuqiEffect.position, wuqiEffect.rotation);
             var rb = bulletIns.GetComponent<bullet>();
-            if (rb != null) rb.velocity = wuqiEffect.forward; // 发射速度
+            Vector3 dir = wuqiEffect.forward;
+// 忽略 Y 分量（强制平行于地面）
+            dir.y = 0f;
+            dir.Normalize();
+            if (rb != null) rb.velocity = dir; // 发射速度
         }
     }
 
@@ -299,6 +303,10 @@ public class NpcController : ATCActor
             }
 
         bUpdateTRS = true;
+    }
+
+    protected override void OnRewindHeadRecord()
+    {
     }
 
     #endregion

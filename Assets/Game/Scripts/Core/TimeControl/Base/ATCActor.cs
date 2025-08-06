@@ -25,10 +25,10 @@ namespace TVA
         {
             if (bDestroyed)
                 return;
-
+            _pendingCount = _TCables.Length;
             foreach (var tCable in _TCables)
                 if (direct == Direct.Rewind)
-                    tCable.Rewind(rate);
+                    tCable.Rewind(rate,OnRewindHeadRecordIntenal);
                 else
                     tCable.Forward(rate);
 
@@ -55,7 +55,16 @@ namespace TVA
             else
                 AfterRewindAction();
         }
+        
+        private void OnRewindHeadRecordIntenal()
+        {
+            _pendingCount--;
 
+            if (_pendingCount <= 0)
+            {
+                OnRewindHeadRecord();
+            }
+        }
         /// <summary>
         ///     销毁实体，实际需要等待
         /// </summary>
@@ -65,6 +74,15 @@ namespace TVA
             StopAllActions();
             _pendingCount = _TCables.Length;
             foreach (var tCable in _TCables) tCable.FakeDestroy(DestroyCompelety);
+        }
+
+        /// <summary>
+        /// 立刻销毁，不再记录无回溯可能
+        /// </summary>
+        protected void DestroyImmedeletyActor()
+        {
+            _pendingCount = _TCables.Length;
+            foreach (var tCable in _TCables) tCable.DestroyImmediate(DestroyCompelety);
         }
 
         private void DestroyCompelety()
@@ -100,6 +118,11 @@ namespace TVA
         /// 在回溯结束时的处理（恢复更新逻辑）
         /// </summary>
         protected abstract void AfterRewindAction();
+
+        /// <summary>
+        /// 当rewind到开始的记录之后的行为，有可能还没结束rewind,如果新创建3s的子弹回溯5s
+        /// </summary>
+        protected abstract void OnRewindHeadRecord();
 
         #endregion
     }

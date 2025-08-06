@@ -16,6 +16,7 @@ public class Ball : MonoBehaviour
     public HashSet<IAreaEntityListener> npcsInside = new();
     private int overlapCount;
     private Renderer rend;
+    private int areaRate = 1;
 
     private void Awake()
     {
@@ -67,7 +68,13 @@ public class Ball : MonoBehaviour
         {
             var entity = other.gameObject.GetComponent<IAreaEntityListener>();
             if (entity != null)
+            {
+                if(!npcsInside.Contains(entity))
                 npcsInside.Add(entity);
+                if(beginTC)
+                    entity.OnEnterTCArea(direct,areaRate);
+            }
+                
         }
     }
 
@@ -124,7 +131,17 @@ public class Ball : MonoBehaviour
         Destroy(gameObject, lifeTime); // 5 秒后销毁
 
         beginTC = true;
-        foreach (var entity in npcsInside) entity.OnEnterTCArea(direct, rate);
+        areaRate = rate;
+        float worldRadius = GetComponent<SphereCollider>().radius * Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
+        Collider[] hitColliders = Physics.OverlapSphere( transform.position, worldRadius, npcLayer);
+        foreach (Collider hitCollider in hitColliders)
+        {
+            npcsInside.Add(hitCollider.GetComponent<IAreaEntityListener>());
+        }
+
+        foreach (var entity in npcsInside)
+            if(entity != null)
+                entity.OnEnterTCArea(direct, rate);
     }
 
     private void UpdateColor()

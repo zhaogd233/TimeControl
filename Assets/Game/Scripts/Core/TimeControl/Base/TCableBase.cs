@@ -29,6 +29,8 @@ namespace TVA
         private TVRingBuffer<T> _recordbuffer;
 
         private Action DestoryCompeletyAction;
+        private Action _rewindHeadAction;
+        
         private int forwardRate = 1;
         private int rewindRate = 1;
         public bool IsDestorying { private set; get; } //标记已被逻辑销毁，但可能会回溯出来
@@ -92,9 +94,10 @@ namespace TVA
         /// </summary>
         /// <param name="seconds"></param>
         /// <param name="rate"></param>
-        public void Rewind(int rate)
+        public void Rewind(int rate,Action rewindHeadRecordAction)
         {
             TCDirect = Direct.Rewind;
+             _rewindHeadAction = rewindHeadRecordAction;
             _lastRewindSeconds = 0;
             rewindRate = rate;
         }
@@ -148,6 +151,13 @@ namespace TVA
             _destoryTime = 0;
         }
 
+        public void DestroyImmediate(Action OnComplete = null)
+        {
+            DestoryCompeletyAction = OnComplete;
+            IsDestorying = true;
+            DestoryCompeletyInternal();
+        }
+
         /// <summary>
         ///     正播&加速
         ///     只有从没有的数据开始播，才算记录，旧的加速还是回溯。
@@ -166,8 +176,16 @@ namespace TVA
         private void RewindInternal(float deltaTime)
         {
             var offsetRewindSeconds = _lastRewindSeconds + deltaTime * rewindRate;
-            if (offsetRewindSeconds < 0 || offsetRewindSeconds > _escapeTime)
+            if (offsetRewindSeconds < 0)
                 return;
+
+            //当回溯到0的时候，回调上层，有些新创建的就需要销毁
+            if (offsetRewindSeconds > _escapeTime)
+            {
+                if (_rewindHeadAction != null)
+                    _rewindHeadAction();
+                return;
+            }
 
             _lastRewindSeconds = offsetRewindSeconds;
 
