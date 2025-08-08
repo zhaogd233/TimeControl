@@ -2659,6 +2659,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4065960115286162581}
   - component: {fileID: 1015205408}
+  - component: {fileID: 4065960115286162582}
   m_Layer: 0
   m_Name: ClockSlider
   m_TagString: Untagged
@@ -2682,6 +2683,19 @@ Transform:
   - {fileID: 4065960116257092587}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4065960115286162582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4065960115286162579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b095a5a24e764d338dfba0c8baebbc3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updateInterval: 0.5
 --- !u!1 &4065960116257092586
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,7 +7,7 @@ public class ActiveStateTCable : TCableBase<bool>
 
     protected override void InitTCObj()
     {
-        Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime,TCManager.Instance.MaxRate);
+        Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime, TCManager.Instance.MaxRate, null);
     }
 
     protected override bool GetCurTrackData(float rate)
@@ -23,5 +23,14 @@ public class ActiveStateTCable : TCableBase<bool>
 
     protected override void FinishRewindAction(bool rewindValue)
     {
+    }
+
+    /// <summary>
+    ///     当前可见再记录其他的，当前不可见就不记录或者回溯其他的
+    /// </summary>
+    /// <returns></returns>
+    protected override bool CheckMainValid()
+    {
+        return target.activeInHierarchy;
     }
 }

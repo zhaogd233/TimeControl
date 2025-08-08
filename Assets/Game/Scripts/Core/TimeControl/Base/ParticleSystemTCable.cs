@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TVA
@@ -11,6 +13,54 @@ namespace TVA
     public struct ParticleFrameData
     {
         public ParticleTrackedData[] particles;
+    }
+
+    public class ParticleFrameDataComparer : IEqualityComparer<ParticleFrameData>
+    {
+        private readonly float _timeEpsilon;
+
+        public ParticleFrameDataComparer(float timeEpsilon = 0.01f)
+        {
+            _timeEpsilon = timeEpsilon;
+        }
+
+        public bool Equals(ParticleFrameData a, ParticleFrameData b)
+        {
+            if (a.particles == null && b.particles == null)
+                return true;
+            if (a.particles == null || b.particles == null)
+                return false;
+            if (a.particles.Length != b.particles.Length)
+                return false;
+
+            for (int i = 0; i < a.particles.Length; i++)
+            {
+                var pa = a.particles[i];
+                var pb = b.particles[i];
+
+                if (pa.isPlaying != pb.isPlaying)
+                    return false;
+                if (Math.Abs(pa.particleTime - pb.particleTime) > _timeEpsilon)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public int GetHashCode(ParticleFrameData obj)
+        {
+            if (obj.particles == null)
+                return 0;
+
+            int hash = 17;
+            foreach (var p in obj.particles)
+            {
+                hash = hash * 31 + p.isPlaying.GetHashCode();
+                hash = hash * 31 + p.particleTime.GetHashCode();
+            }
+
+            return hash;
+        }
     }
 
     public class ParticleSystemTCable : TCableBase<ParticleFrameData>
@@ -35,7 +85,8 @@ namespace TVA
 
         protected override void InitTCObj()
         {
-            Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime,TCManager.Instance.MaxRate);
+            Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime, TCManager.Instance.MaxRate,
+                new ParticleFrameDataComparer());
         }
 
         protected override ParticleFrameData GetCurTrackData(float rate)
@@ -92,6 +143,11 @@ namespace TVA
                     _particleSystems[i].Play();
                 }
             }
+        }
+
+        protected override bool CheckMainValid()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -88,6 +88,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bDebug: 0
+  MainTCable: 0
   TCDirect: 0
 --- !u!114 &8456791840295605028
 MonoBehaviour:
@@ -102,6 +103,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bDebug: 0
+  MainTCable: 1
   TCDirect: 0
   target: {fileID: 6041328982993624121}
 --- !u!1 &3215434118703740673

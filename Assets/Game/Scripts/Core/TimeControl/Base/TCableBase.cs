@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TVA
@@ -6,13 +7,17 @@ namespace TVA
     public enum Direct
     {
         Forward, //正向
-        Rewind, //回溯
-        FinishForward //操控结束开始正向
+        Rewind //回溯
     }
 
     public abstract class TCableBase<T> : MonoBehaviour, ITCable
     {
         public bool bDebug;
+
+        /// <summary>
+        ///     主控开关，主控无效，其他tcable不再更新记录&回溯
+        /// </summary>
+        public bool MainTCable;
 
         [HideInInspector] public Direct TCDirect = Direct.Forward;
 
@@ -27,18 +32,11 @@ namespace TVA
 
         private float _maxSecond;
 
-        #region 记录优化，根据倍速记录，只记录需要播放的帧数据
-
-        private int _maxRate = 1;
-        private int _lastRecordCount = 0;
-
-        #endregion
-        
         private TVRingBuffer<T> _recordbuffer;
+        private Action _rewindHeadAction;
 
         private Action DestoryCompeletyAction;
-        private Action _rewindHeadAction;
-        
+
         private int forwardRate = 1;
         private int rewindRate = 1;
         public bool IsDestorying { private set; get; } //标记已被逻辑销毁，但可能会回溯出来
@@ -49,12 +47,8 @@ namespace TVA
             SetDebug(bDebug);
         }
 
-        public void FixedTick(float deltaTime)
+        public void Tick(float deltaTime)
         {
-            /*if (TCDirect == Direct.FinishForward)
-            {
-                FinishTimeControlInternal();
-            }*/
             if (TCDirect == Direct.Forward)
             {
                 if (IsDestorying)
@@ -90,6 +84,16 @@ namespace TVA
             }
         }
 
+        public bool IsMainTCable()
+        {
+            return MainTCable;
+        }
+
+        public bool ValidMainTCable()
+        {
+            return !IsDestorying && CheckMainValid();
+        }
+
         public void Forward(int rate)
         {
             TCDirect = Direct.Forward;
@@ -103,10 +107,10 @@ namespace TVA
         /// </summary>
         /// <param name="seconds"></param>
         /// <param name="rate"></param>
-        public void Rewind(int rate,Action rewindHeadRecordAction)
+        public void Rewind(int rate, Action rewindHeadRecordAction)
         {
             TCDirect = Direct.Rewind;
-             _rewindHeadAction = rewindHeadRecordAction;
+            _rewindHeadAction = rewindHeadRecordAction;
             _lastRewindSeconds = 0;
             rewindRate = rate;
         }
@@ -140,18 +144,6 @@ namespace TVA
         }
 
         /// <summary>
-        ///     初始化存储数据
-        /// </summary>
-        public void Initialized(int maxSecond, float updateDelta,int maxRate)
-        {
-            _maxSecond = maxSecond;
-            _maxRate = maxRate;
-            var countPerSec = (int)(1.0f / updateDelta);
-            _recordbuffer = new TVRingBuffer<T>(maxSecond * countPerSec / maxRate, countPerSec,maxRate );
-            TCManager.Instance.AddObjectForTracking(this);
-        }
-
-        /// <summary>
         ///     销毁的时候，先disable,等过了记录周期之后，才彻底销毁
         /// </summary>
         public void FakeDestroy(Action OnComplete = null)
@@ -169,6 +161,17 @@ namespace TVA
         }
 
         /// <summary>
+        ///     初始化存储数据
+        /// </summary>
+        public void Initialized(int maxSecond, float updateDelta, int maxRate, IEqualityComparer<T> comparer)
+        {
+            _maxSecond = maxSecond;
+            _maxRate = maxRate;
+            var countPerSec = (int)(1.0f / updateDelta);
+            _recordbuffer = new TVRingBuffer<T>(maxSecond * countPerSec / maxRate, countPerSec, maxRate, comparer);
+        }
+
+        /// <summary>
         ///     正播&加速
         ///     只有从没有的数据开始播，才算记录，旧的加速还是回溯。
         ///     rate 倍速要写多份
@@ -178,23 +181,19 @@ namespace TVA
             _escapeTime += delaTime * forwardRate;
             _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
             var value = GetCurTrackData(forwardRate);
-            
+
             //只记录需要播放帧的数据
-            if(forwardRate > 1)
+            if (forwardRate > 1)
+            {
                 RecordValue(value);
+            }
             else
             {
-                if (_lastRecordCount == 0)
-                {
-                    RecordValue(value);
-                }
-                    _lastRecordCount++;
+                if (_lastRecordCount == 0) RecordValue(value);
+                _lastRecordCount++;
                 if (_lastRecordCount >= _maxRate)
                     _lastRecordCount = 0;
             }
-           // for (var i = 0; i < forwardRate; i++) RecordValue(value);
-            //判断是否超过已经最大记录，如果
-            // TrackAction(rate);
         }
 
         private void RewindInternal(float deltaTime)
@@ -213,12 +212,8 @@ namespace TVA
 
             _lastRewindSeconds = offsetRewindSeconds;
 
-            //
             if (TryGetRecordValue(offsetRewindSeconds, out var valuesToRead))
                 RewindAction(valuesToRead);
-
-            //更新写入位置，之后的数据重新写入
-            //    buffers.MoveLastBufferPos(seconds);
         }
 
         /// <summary>
@@ -232,8 +227,7 @@ namespace TVA
                 Debug.LogError("尚未调用Initialized");
                 return;
             }
-            if(bDebug)
-Debug.LogError(Time.frameCount);
+
             _recordbuffer.RecordValue(value);
         }
 
@@ -257,8 +251,6 @@ Debug.LogError(Time.frameCount);
                 Debug.LogError("尚未调用Initialized");
                 return;
             }
-
-            TCManager.Instance.RemoveObjectForTracking(this);
 
             if (DestoryCompeletyAction != null)
                 DestoryCompeletyAction();
@@ -292,6 +284,13 @@ Debug.LogError(Time.frameCount);
             return rewindRate > 1 || forwardRate > 1;
         }
 
+        #region 记录优化，根据倍速记录，只记录需要播放的帧数据
+
+        private int _maxRate = 1;
+        private int _lastRecordCount;
+
+        #endregion
+
         #region 子类需要去实现的具体逻辑
 
         protected abstract void InitTCObj();
@@ -314,6 +313,15 @@ Debug.LogError(Time.frameCount);
         /// </summary>
         /// <param name="rewindValue"></param>
         protected abstract void FinishRewindAction(T rewindValue);
+
+        /// <summary>
+        ///     主控对象，当前是否有效（可见）
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool CheckMainValid()
+        {
+            return true;
+        }
 
         #endregion
     }

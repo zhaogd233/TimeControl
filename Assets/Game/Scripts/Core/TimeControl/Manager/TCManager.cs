@@ -7,10 +7,10 @@ namespace TVA
     {
         [SerializeField] public int TrackTime;
         [SerializeField] public int MaxRate = 2;
-        private List<ITCable> _AddCables; // 时间可操控对象
-        private List<ITCable> _DelCables; // 时间可操控对象
 
-        private HashSet<ITCable> _TCables; // 时间可操控对象
+        private HashSet<ATCActor> _actors; // 时间可操控对象
+        private List<ATCActor> _AddActors; // 时间可操控对象
+        private List<ATCActor> _DelActors; // 时间可操控对象
 
         /// <summary>
         ///     Singleton instance of RewindManager
@@ -21,19 +21,21 @@ namespace TVA
         {
             if (Instance != null && Instance != this) Destroy(Instance);
 
-            _TCables = new HashSet<ITCable>();
-            _DelCables = new List<ITCable>();
-            _AddCables = new List<ITCable>();
+            _actors = new HashSet<ATCActor>();
+            _DelActors = new List<ATCActor>();
+            _AddActors = new List<ATCActor>();
             Instance = this;
         }
 
         private void FixedUpdate()
         {
-            foreach (var tCable in _AddCables) _TCables.Add(tCable);
-            _AddCables.Clear();
-            foreach (var tCable in _DelCables) _TCables.Remove(tCable);
-            _DelCables.Clear();
-            foreach (var tCable in _TCables) tCable.FixedTick(Time.fixedDeltaTime);
+            foreach (var actor in _AddActors) _actors.Add(actor);
+            _AddActors.Clear();
+            foreach (var actor in _DelActors) _actors.Remove(actor);
+            _DelActors.Clear();
+
+            var deltaTime = Time.fixedDeltaTime;
+            foreach (var actor in _actors) actor.Tick(deltaTime);
         }
 
         #region 操控对象管理
@@ -42,14 +44,14 @@ namespace TVA
         ///     跟踪可被操控的对象
         /// </summary>
         /// <param name="tcable"></param>
-        public void AddObjectForTracking(ITCable tcable)
+        public void AddObjectForTracking(ATCActor actor)
         {
-            _AddCables.Add(tcable);
+            _AddActors.Add(actor);
         }
 
-        public void RemoveObjectForTracking(ITCable tcable)
+        public void RemoveObjectForTracking(ATCActor actor)
         {
-            _DelCables.Add(tcable);
+            _DelActors.Add(actor);
         }
 
         #endregion

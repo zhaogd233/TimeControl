@@ -5,7 +5,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 /// <summary>
-/// 测试用的npc ,ai 是随机模拟
+///     测试用的npc ,ai 是随机模拟
 /// </summary>
 public class NpcController : ATCActor
 {
@@ -42,19 +42,19 @@ public class NpcController : ATCActor
     };
 
     //debug 显示用的
-    private AnimationTCable _animationTCable;
     private Camera _camera;
 
     private bool bUpdateTRS;
+    private FPSDisplay fpsDisplay;
     private bool isRunning;
 
     // 平滑转向目标
     private Quaternion targetRotation;
 
-
     private void Awake()
     {
         _camera = Camera.main;
+        fpsDisplay = FindObjectOfType<FPSDisplay>();
     }
 
     protected override void Start()
@@ -64,7 +64,6 @@ public class NpcController : ATCActor
         if (anim == null)
             anim = GetComponentInChildren<Animation>();
 
-        _animationTCable = GetComponentInChildren<AnimationTCable>();
         targetRotation = transform.rotation;
         bUpdateTRS = true;
         PlayRandomAnimation();
@@ -101,20 +100,27 @@ public class NpcController : ATCActor
 
     #region Debug 显示
 
-    
     private void LateUpdate()
     {
-        if (_camera != null && TimeTMP != null)
+        if (_camera != null && TimeTMP != null && MainTCable != null)
         {
+            if (fpsDisplay != null)
+            {
+                TimeTMP.gameObject.SetActive(fpsDisplay.HUDEnabled);
+
+                if (!fpsDisplay.HUDEnabled)
+                    return;
+            }
+
             // 直接面向相机
             TimeTMP.transform.forward = _camera.transform.forward;
 
-            var recordTime = Mathf.Max(0, _animationTCable.GetRecordTime());
+            var recordTime = Mathf.Max(0, MainTCable.GetRecordTime());
             TimeTMP.text = $"{recordTime:F1}s";
 
-            if (_animationTCable.IsDestorying)
+            if (MainTCable.IsDestorying)
             {
-                TimeTMP.text = $"dead:{_animationTCable.GetDestroyingTime():F1}s";
+                TimeTMP.text = $"dead:{MainTCable.GetDestroyingTime():F1}s";
                 TimeTMP.color = Color.black;
                 return;
             }
@@ -122,9 +128,9 @@ public class NpcController : ATCActor
             ;
             if (recordTime <= 0)
                 TimeTMP.color = Color.red;
-            else if (_animationTCable.TCDirect == Direct.Rewind)
+            else if (MainTCable.TCDirect == Direct.Rewind)
                 TimeTMP.color = new Color(0.4845996f, 0, 1, 1);
-            else if (_animationTCable.IsTimeControling())
+            else if (MainTCable.IsTimeControling())
                 TimeTMP.color = Color.green;
             else
                 TimeTMP.color = Color.white;
@@ -135,13 +141,12 @@ public class NpcController : ATCActor
 
     #region 简单AI
 
-    
     private void PlayRandomAnimation(string lastClip = "", float leftTime = 0f)
     {
         StopAllCoroutines();
 
         if (animationNames == null || animationNames.Length == 0) return;
-        if (_animationTCable != null && _animationTCable.TCDirect == Direct.Rewind)
+        if (MainTCable != null && MainTCable.TCDirect == Direct.Rewind)
             return;
 
         // 随机挑选动画
@@ -169,7 +174,7 @@ public class NpcController : ATCActor
         }
 
         // 播放动画
-        if (_animationTCable != null && _animationTCable.TCDirect == Direct.Forward)
+        if (MainTCable != null && MainTCable.TCDirect == Direct.Forward)
         {
             anim.Play(clipName);
             state.speed = actorRate;
@@ -223,7 +228,7 @@ public class NpcController : ATCActor
         {
             var bulletIns = Instantiate(bullet, wuqiEffect.position, wuqiEffect.rotation);
             var rb = bulletIns.GetComponent<bullet>();
-            Vector3 dir = wuqiEffect.forward;
+            var dir = wuqiEffect.forward;
 // 忽略 Y 分量（强制平行于地面）
             dir.y = 0f;
             dir.Normalize();
@@ -232,10 +237,9 @@ public class NpcController : ATCActor
     }
 
     #endregion
-    
+
     #region 子类实现关键接口
 
-    
     protected override void StopAllActions()
     {
         StopAllCoroutines();
@@ -310,5 +314,4 @@ public class NpcController : ATCActor
     }
 
     #endregion
-    
 }

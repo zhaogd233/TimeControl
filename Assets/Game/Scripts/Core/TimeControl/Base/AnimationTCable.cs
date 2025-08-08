@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TVA
@@ -6,6 +8,38 @@ namespace TVA
     {
         public string clipName; // 正在播放的剪辑名
         public float time; // 剪辑内部播放时间（秒）
+    }
+
+    public class LegacyAnimationTrackedDataComparer : IEqualityComparer<LegacyAnimationTrackedData>
+    {
+        private readonly float _timeEpsilon;
+
+        public LegacyAnimationTrackedDataComparer(float timeEpsilon = 0.01f)
+        {
+            _timeEpsilon = timeEpsilon;
+        }
+
+        public bool Equals(LegacyAnimationTrackedData a, LegacyAnimationTrackedData b)
+        {
+            if (a.clipName != b.clipName)
+                return false;
+
+            if (Math.Abs(a.time - b.time) > _timeEpsilon)
+                return false;
+
+            return true;
+        }
+
+        public int GetHashCode(LegacyAnimationTrackedData obj)
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + (obj.clipName?.GetHashCode() ?? 0);
+                hash = hash * 31 + obj.time.GetHashCode();
+                return hash;
+            }
+        }
     }
 
     public class AnimationTCable : TCableBase<LegacyAnimationTrackedData>
@@ -21,7 +55,8 @@ namespace TVA
 
         protected override void InitTCObj()
         {
-            Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime,TCManager.Instance.MaxRate);
+            Initialized(TCManager.Instance.TrackTime, Time.fixedDeltaTime, TCManager.Instance.MaxRate,
+                new LegacyAnimationTrackedDataComparer());
             //  SetDebug(true);
         }
 

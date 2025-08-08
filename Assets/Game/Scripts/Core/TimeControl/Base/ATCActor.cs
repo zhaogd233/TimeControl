@@ -1,3 +1,4 @@
+#nullable enable
 using UnityEngine;
 
 namespace TVA
@@ -8,17 +9,32 @@ namespace TVA
     public abstract class ATCActor : MonoBehaviour, IAreaEntityListener
     {
         [Header("实际模型，销毁先隐藏。并保留root的碰撞可见")] public GameObject model;
+        private int _pendingCount;
 
         private ITCable[] _TCables;
 
         protected int actorRate = 1;
 
         private bool bDestroyed;
-        private int _pendingCount;
+        protected ActiveStateTCable? MainTCable { private set; get; }
 
         protected virtual void Start()
         {
             _TCables = GetComponentsInChildren<ITCable>();
+
+            for (var i = 0; i < _TCables.Length; i++)
+                if (_TCables[i].IsMainTCable())
+                {
+                    if (MainTCable != null)
+                        Debug.LogError("当前多个主控", gameObject);
+                    if (_TCables[i] is ActiveStateTCable)
+                        MainTCable = _TCables[i] as ActiveStateTCable;
+                }
+
+            if (MainTCable == null)
+                Debug.LogError("当前没有ActiveStateTCable类型的主控", gameObject);
+
+            TCManager.Instance.AddObjectForTracking(this);
         }
 
         public void OnEnterTCArea(Direct direct, int rate)
@@ -28,7 +44,7 @@ namespace TVA
             _pendingCount = _TCables.Length;
             foreach (var tCable in _TCables)
                 if (direct == Direct.Rewind)
-                    tCable.Rewind(rate,OnRewindHeadRecordIntenal);
+                    tCable.Rewind(rate, OnRewindHeadRecordIntenal);
                 else
                     tCable.Forward(rate);
 
@@ -55,20 +71,33 @@ namespace TVA
             else
                 AfterRewindAction();
         }
-        
+
+        public void Tick(float deltaTime)
+        {
+            if (MainTCable != null)
+            {
+                MainTCable.Tick(deltaTime);
+
+                if (MainTCable.ValidMainTCable())
+                    foreach (var tCable in _TCables)
+                    {
+                        if (tCable == MainTCable) continue;
+                        tCable.Tick(deltaTime);
+                    }
+            }
+        }
+
         private void OnRewindHeadRecordIntenal()
         {
             _pendingCount--;
 
-            if (_pendingCount <= 0)
-            {
-                OnRewindHeadRecord();
-            }
+            if (_pendingCount <= 0) OnRewindHeadRecord();
         }
+
         /// <summary>
         ///     销毁实体，实际需要等待
         /// </summary>
-        protected  void DestroyActor()
+        protected void DestroyActor()
         {
             model?.SetActive(false);
             StopAllActions();
@@ -77,7 +106,7 @@ namespace TVA
         }
 
         /// <summary>
-        /// 立刻销毁，不再记录无回溯可能
+        ///     立刻销毁，不再记录无回溯可能
         /// </summary>
         protected void DestroyImmedeletyActor()
         {
@@ -89,38 +118,43 @@ namespace TVA
         {
             bDestroyed = true;
             _pendingCount--;
-            
+
             if (_pendingCount <= 0)
-             DestroyImmediate(gameObject);
+            {
+                TCManager.Instance.RemoveObjectForTracking(this);
+                DestroyImmediate(gameObject);
+            }
         }
 
         #region 需要子类实现的接口
 
         /// <summary>
-        /// 请求销毁时，停止所有行为（实际先隐藏）
+        ///     请求销毁时，停止所有行为（实际先隐藏）
         /// </summary>
         protected abstract void StopAllActions();
-        
+
         /// <summary>
-        /// 在加速前的处理（动画变速等）
+        ///     在加速前的处理（动画变速等）
         /// </summary>
         protected abstract void BeforeAccelerateAction();
-        
+
         /// <summary>
-        /// 在加速结束的处理（动画恢复正常速度等）
+        ///     在加速结束的处理（动画恢复正常速度等）
         /// </summary>
         protected abstract void AfterAccelerateAction();
+
         /// <summary>
-        /// 在回溯之前的处理（暂时逻辑的更新）
+        ///     在回溯之前的处理（暂时逻辑的更新）
         /// </summary>
         protected abstract void BeforeRewindAction();
+
         /// <summary>
-        /// 在回溯结束时的处理（恢复更新逻辑）
+        ///     在回溯结束时的处理（恢复更新逻辑）
         /// </summary>
         protected abstract void AfterRewindAction();
 
         /// <summary>
-        /// 当rewind到开始的记录之后的行为，有可能还没结束rewind,如果新创建3s的子弹回溯5s
+        ///     当rewind到开始的记录之后的行为，有可能还没结束rewind,如果新创建3s的子弹回溯5s
         /// </summary>
         protected abstract void OnRewindHeadRecord();
 

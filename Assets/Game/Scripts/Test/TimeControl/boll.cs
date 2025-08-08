@@ -6,22 +6,22 @@ public class Ball : MonoBehaviour
 {
     public Color normalColor = Color.white;
     public Color overlapColor = Color.red;
-    
+
     /// <summary>
-    /// 回溯圈的单位离开之后还能继续回溯。
-    /// 加速圈的单位离开之后就不能继续加速
+    ///     回溯圈的单位离开之后还能继续回溯。
+    ///     加速圈的单位离开之后就不能继续加速
     /// </summary>
     public Direct direct;
 
     public LayerMask npcLayer; // 只检测 NPC 层
     private readonly List<Ball> overlappingBalls = new();
+    private int areaRate = 1;
     private bool beginTC;
     private float checkRadius;
 
     public HashSet<IAreaEntityListener> npcsInside = new();
     private int overlapCount;
     private Renderer rend;
-    private int areaRate = 1;
 
     private void Awake()
     {
@@ -73,16 +73,13 @@ public class Ball : MonoBehaviour
         {
             var entity = other.gameObject.GetComponent<IAreaEntityListener>();
             if (entity != null)
-            {
-                if(direct == Direct.Forward)
+                if (direct == Direct.Forward)
                 {
                     if (!npcsInside.Contains(entity))
                         npcsInside.Add(entity);
                     if (beginTC)
                         entity.OnEnterTCArea(direct, areaRate);
                 }
-            }
-                
         }
     }
 
@@ -140,15 +137,13 @@ public class Ball : MonoBehaviour
 
         beginTC = true;
         areaRate = rate;
-        float worldRadius = GetComponent<SphereCollider>().radius * Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
-        Collider[] hitColliders = Physics.OverlapSphere( transform.position, worldRadius, npcLayer);
-        foreach (Collider hitCollider in hitColliders)
-        {
-            npcsInside.Add(hitCollider.GetComponent<IAreaEntityListener>());
-        }
+        var worldRadius = GetComponent<SphereCollider>().radius *
+                          Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
+        var hitColliders = Physics.OverlapSphere(transform.position, worldRadius, npcLayer);
+        foreach (var hitCollider in hitColliders) npcsInside.Add(hitCollider.GetComponent<IAreaEntityListener>());
 
         foreach (var entity in npcsInside)
-            if(entity != null)
+            if (entity != null)
                 entity.OnEnterTCArea(direct, rate);
     }
 
