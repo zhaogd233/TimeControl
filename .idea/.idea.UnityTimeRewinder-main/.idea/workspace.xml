@@ -117,7 +117,7 @@
       <updated>1753861099966</updated>
       <workItem from="1753861101827" duration="42350000" />
       <workItem from="1753959192505" duration="41277000" />
-      <workItem from="1754297406604" duration="39647000" />
+      <workItem from="1754297406604" duration="43081000" />
     </task>
     <servers />
   </component>
@@ -220,32 +220,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="42" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Game/Scripts/Test/boll.cs</url>
-          <line>149</line>
-          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\Game\Scripts\Test\boll.cs" containingFunctionPresentation="方法 'BeginTimeControl'">
-            <startOffsets>
-              <option value="4343" />
-            </startOffsets>
-            <endOffsets>
-              <option value="4377" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="48" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Game/Scripts/Test/bullet.cs</url>
-          <line>111</line>
-          <properties documentPath="F:\Project\UnityRewind\UnityTimeRewinder-main\Assets\Game\Scripts\Test\bullet.cs" containingFunctionPresentation="方法 'OnRewindHeadRecord'">
-            <startOffsets>
-              <option value="2808" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2833" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Assets/Game/Scripts/Core/TimeControl/Base/TCableBase.cs</url>

@@ -1,87 +1,83 @@
-</p>
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/68167377/196243323-3509d486-b9dd-4575-9753-134ab1b39de2.png"/>
-</p>
 
-# Time Rewinder for Unity
+# Time Control Actor Demo
 
-Rewind time in Unity with ease! While there are certain frameworks that let you rewind time in Unity, they are usually quite restrictive and hard to modify. I faced these problems myself when i needed to add time rewind mechanics in my game and none of the solutions that i have found were good enough. That is why i decided to start this open source project that i hope you find usefull. Time Rewinder uses highly efficient circular buffer implementation to store and retrieve the rewinded values.
+这是一个用于演示 **局部时间控制（Time Control）** 的 Unity Demo 项目，支持 **局部加速** 与 **局部回溯（减速/倒带）** 功能，适用于大世界、多人交互、复杂状态同步等场景。
 
-**Customizability is one of the main points of this project, so it can be used in any of your custom Unity projects and you can track and rewind anything you want, even Shaders!**
+## ✨ 核心特性
 
-Straight from the box you can start rewinding **Object active states, Transforms (position, rotation, scale), velocities, animators (also all animator layers and parameters), audios and particle systems**.
-
-## How to install
-
-You have two options how to install it into your project.
-
-- First option is to download prepared Unity package in Github release section. After download, open your Unity project and simply open the downloaded package, import dialogue window should appear (Unity should automatically associate the package with itself). If it didnt work out for you, you can also import it thru Unity package manager.
-- Second option is to download this sample project from Github and start using it, or just import the TimeRewinder folder under Assets/TimeRewinder into your project
-
-<b>Note:</b> Unity versions 2019+ are officially supported
-
-## Features
-
-TimeRewinder supports two types of rewinds.
-
-- Instant rewinds where you rewind time by specified amount of seconds
-- Rewinds with previews
-
-The latter of the two is definitely more interesting option, cause you can freely choose which snapshot you can return to after you spectate these previews for yourself. This is especially helpfull if you want to give more control to player with rewinding time. As shown in demo-scene examples, player can choose on the time axis the exact moment he wants to return to, while the tracked attributes are paused. The showcase of this mechanic is shown right below. I think, this is also unique feature of this project, because i havent found a similar functionality in other Time Rewind frameworks.
-
-![ezgif com-gif-maker (9)](https://user-images.githubusercontent.com/68167377/196203578-a476d5b1-5314-49bd-933d-904eba1dd51a.gif)
-
-The classic functionality to rewind time by holding button, which you probably already know from other solutions is also here. These two types of rewinds inputs are prepared straight from the box, but it would be very easy to design completely new rewind input system. You would only have to call corresponding methods, that are all prepared and documented for you.
-
-![ezgif com-gif-maker (10)](https://user-images.githubusercontent.com/68167377/196241351-b1c05483-79e1-4554-8fc2-d4f6efc69b14.gif)
+- ✅ 支持**每个角色或对象独立控制时间**
+- 🔄 可进行**局部回溯**（倒放指定时间段内的状态）
+- ⏩ 可进行**局部加速播放**（快放特定区域中的角色）
+- 💾 使用高效的**环形缓冲区 + 位图压缩结构**记录状态变化
+- 🧩 支持自定义的状态追踪模块（如 Transform、粒子系统、动画等）
+- ⚡️ 低GC、低延迟、适合移动设备或大规模实体场景
 
 
-## How to use
-
-Detailed steps how to use TimeRewinder are described in [documentation](https://github.com/SitronX/UnityTimeRewinder/blob/main/Assets/TimeRewinder/Documentation/Unity%20Time%20Rewinder.pdf) and all important parts of code are also documented.
-
-If you still face any problem, feel free to contact me, i can help you out.
-
-## Showcase of rewinding
+## 🧱 项目结构
 
 
-In demo-scenes there are few examples of time rewinding, as well as two examples of tracking and rewinding custom variables. I recommend you look into it, so you get the idea how everything is connected. Here comes few other videos showcasing rewinding time from demo scenes
+TVA/
+├── ATCActor.cs              # 支持时间控制的角色基类（Actor）
+├── ITCable.cs               # 可被时间控制的子模块接口（Time Cable）
+├── TCableBase<T>.cs         # 泛型时间记录模块（支持自定义类型）
+├── TVRingBuffer<T>.cs       # 支持压缩回溯的环形缓冲记录器
+├── \[ParticleCable.cs]       # 示例：粒子系统控制模块
+├── \[TransformCable.cs]      # 示例：Transform（位置/旋转/缩放）控制模块
+├── TimeControlArea.cs       # 时间控制触发器（控制进入区域的 Actor）
 
 
+---
 
-https://user-images.githubusercontent.com/68167377/196215651-c3002e8b-a722-4bb6-b655-81946cfeff18.mp4
+## 📦 示例功能
 
-https://user-images.githubusercontent.com/68167377/196215735-e3e612a4-aa69-40e2-8e4f-3fd68669b667.mp4
+- **进入某区域**时，对应的 `ATCActor` 会收到通知：
+  - 如果是回溯区：对象倒退一定时间内的状态（支持逐帧插值）
+  - 如果是加速区：对象加快播放其行为逻辑（如动画、移动等）
 
-https://github.com/SitronX/UnityTimeRewinder/assets/68167377/a4e742ff-1bd2-4108-a6bb-eed39d1c62e6
+- 所有状态通过 `TVRingBuffer<T>` 记录，仅在状态变化时写入，提升性能。
+- 状态变更用 `bitmask` 标记，避免不必要的数据回溯。
+- 状态记录支持浮点误差容忍、自定义比较器。
 
-https://user-images.githubusercontent.com/68167377/196240813-ba4c6b79-ebec-461e-9bbe-335cc75a7af7.mp4
+---
 
-https://github.com/user-attachments/assets/5c8473c5-e45a-4ea2-bc36-22b67b658afe
+## 🧪 支持的数据类型（可扩展）
 
-And here is example and maybe motivation how it could look in actual game (mobile game), where you customize it for your needs :)
+以下为已有的时间控制模块，可按需继承 `TCableBase<T>` 扩展更多模块：
+
+- Transform 数据（位置 / 旋转 / 缩放）
+- 粒子系统播放状态
+- 动画播放状态（可配合 clipName + 时间）
+- 自定义结构体（如 Buff 状态、技能状态等）
+
+---
+
+## 🚀 使用方法
+
+1. 在场景中创建实现了 `ATCActor` 的角色（或使用已有示例）
+2. 为角色挂载若干 `TCableBase<T>` 子模块（例如：TransformCable）
+3. 在场景中布置 `TimeControlArea` 区域，设置为回溯或加速区域
+4. 当角色进入区域后，系统自动开始时间控制行为
+
+---
+
+## 💡 开发建议
+
+- 主控与子控机制：可通过设置某个 TCable 模块为主控（如“是否活跃”），仅在主控有效时记录其他数据。
+- 回溯优化：默认按 2x 或更高倍速采样，节省大量内存与写入。
+- 可嵌入式设计：TVRingBuffer 无GC，固定内存结构，适合嵌入式环境或大并发场景。
+
+---
+
+## 📸 截图预览
 
 
-https://user-images.githubusercontent.com/68167377/196215814-45e4667b-748a-4eff-a2ce-8c62b9d90f29.mp4
+---
 
-## Coverage
+## 📄 许可协议
 
-Here you can watch nice video by SpeedTutor covering this asset
+本项目为内部演示用途，可自由修改和扩展。若需商业使用，请联系项目所有者。
 
-[![Watch the video](https://img.youtube.com/vi/4BiPytgJmVo/maxresdefault.jpg)](https://www.youtube.com/watch?v=4BiPytgJmVo)
+---
 
-## License
+```
 
-This asset is completely free under the [MIT license](https://github.com/SitronX/UnityTimeRewinder?tab=MIT-1-ov-file), so you can use it as you wish :)
-
-If you like my projects, please consider buying me a coffee to support my work. All donations will be greatly appreaciated :)
-
-[![BuyMeACoffe](https://github.com/user-attachments/assets/d02ae4a8-3c28-4b01-8b15-807871893856)](https://buymeacoffee.com/sitronx)
-
-## Shameless plug
-
-The main propeler of this project is my released game where you can find this rewind system in practice. This physics based puzzle game is available for free on [Google Play](https://play.google.com/store/apps/details?id=com.SitronCOR.Forcel).
-
-[![GooglePlay](https://github.com/SitronX/UnityTimeRewinder/assets/68167377/0723f83b-cb70-4777-a85d-67a7bb138696)](https://play.google.com/store/apps/details?id=com.SitronCOR.Forcel)
-
-<b>Thank you if you decide to try it out :)</b>
