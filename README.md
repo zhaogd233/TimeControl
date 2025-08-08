@@ -12,20 +12,18 @@
 - 🧩 支持自定义的状态追踪模块（如 Transform、粒子系统、动画等）
 - ⚡️ 低GC、低延迟、适合移动设备或大规模实体场景
 
-
 ## 🧱 项目结构
 
-
+```text
 TVA/
-├── ATCActor.cs              # 支持时间控制的角色基类（Actor）
-├── ITCable.cs               # 可被时间控制的子模块接口（Time Cable）
-├── TCableBase<T>.cs         # 泛型时间记录模块（支持自定义类型）
-├── TVRingBuffer<T>.cs       # 支持压缩回溯的环形缓冲记录器
-├── \[ParticleCable.cs]       # 示例：粒子系统控制模块
-├── \[TransformCable.cs]      # 示例：Transform（位置/旋转/缩放）控制模块
-├── TimeControlArea.cs       # 时间控制触发器（控制进入区域的 Actor）
-
-
+├── ATCActor.cs             # 支持时间控制的角色基类（Actor）
+├── ITCable.cs              # 可被时间控制的子模块接口（Time Cable）
+├── TCableBase.cs           # 泛型时间记录模块（支持自定义类型）
+├── TVRingBuffer.cs         # 支持压缩回溯的环形缓冲记录器
+├── ParticleCable.cs        # 示例：粒子系统控制模块
+├── TransformCable.cs       # 示例：Transform（位置/旋转/缩放）控制模块
+├── IAreaEntityListener.cs      # 时间控制listener（进入区域的 Actor）
+```
 ---
 
 ## 📦 示例功能
