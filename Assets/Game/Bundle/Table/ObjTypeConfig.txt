@@ -1,0 +1,10 @@
+Id	Name	Capacity	ExpireTime	ReleaseInterval
+INT	STRING	INT	INT	INT
+MAX_ID=102400;MAX_RECORD=102500;				
+#				
+1	Default	50	60	60
+2	Player	50	60	60
+3	Effect	50	60	60
+4	Item	50	60	60
+5	TCActor	50	60	60
+6	HomePlayer	1	60	60

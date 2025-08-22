@@ -1,0 +1,17 @@
+{
+  "name": "logic.tables",
+  "rootNamespace": "",
+  "references": [
+    "GUID:f611f00ee90767c41972e5946c9d6ef4",
+    "GUID:72d430584fae5a448a2defde6ddf1ff9"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

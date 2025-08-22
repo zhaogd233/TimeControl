@@ -1,0 +1,18 @@
+{
+  "name": "core.fsm",
+  "rootNamespace": "",
+  "references": [
+    "GUID:2f2bd4a792a0f644a8d1c8012e762acb",
+    "GUID:0025e7810782c034bbb8068a8f0bda7a",
+    "GUID:b4bcf38c29202044281f43458c29a1f8"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

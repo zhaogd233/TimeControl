@@ -1,0 +1,6 @@
+SceneID	Name	ResName	ScenePolesInfo
+INT	STRING	STRING	STRING
+MAX_ID=1023;MAX_RECORD=1024;			
+#			
+0	城堡	Demo_Room	
+1	塔防	Demo_Tafang	

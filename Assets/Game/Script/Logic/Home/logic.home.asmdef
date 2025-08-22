@@ -1,0 +1,17 @@
+{
+  "name": "logic.home",
+  "rootNamespace": "",
+  "references": [
+    "GUID:b4bcf38c29202044281f43458c29a1f8",
+    "GUID:2f2bd4a792a0f644a8d1c8012e762acb"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

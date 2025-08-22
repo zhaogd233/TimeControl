@@ -1,0 +1,23 @@
+{
+  "name": "logic.data",
+  "rootNamespace": "",
+  "references": [
+    "GUID:4d4a86a57da980043b3285df2c75d566",
+    "GUID:a28f182af7b476543b0ed250f5419bb6",
+    "GUID:2f2bd4a792a0f644a8d1c8012e762acb",
+    "GUID:0025e7810782c034bbb8068a8f0bda7a",
+    "GUID:ff94a76ca24289449b16f5bcb8a91b8d",
+    "GUID:b4bcf38c29202044281f43458c29a1f8",
+    "GUID:0539a5a128853e74991abce57fcda51a",
+    "GUID:0d42c68dda22c5b449ccf9771b5923ae"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

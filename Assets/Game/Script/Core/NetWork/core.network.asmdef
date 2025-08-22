@@ -1,0 +1,8 @@
+{
+  "name": "core.network",
+  "references": [
+    "GenericEventBus",
+    "core.base",
+    "core.eventbus"
+  ]
+}

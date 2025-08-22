@@ -1,0 +1,25 @@
+{
+  "name": "logic.ui",
+  "rootNamespace": "",
+  "references": [
+    "GUID:2f2bd4a792a0f644a8d1c8012e762acb",
+    "GUID:280e8b1645efe564082de3a1bc07aee2",
+    "GUID:f51ebe6a0ceec4240a699833d6309b23",
+    "GUID:6055be8ebefd69e48b49212b09b47b2f",
+    "GUID:b427b368ad8b6d5438a82eaa72c93914",
+    "GUID:0d42c68dda22c5b449ccf9771b5923ae",
+    "GUID:f611f00ee90767c41972e5946c9d6ef4",
+    "GUID:0025e7810782c034bbb8068a8f0bda7a",
+    "GUID:6310d3c5dff4ed94b934d71928c1095d",
+    "GUID:275e30a5c95b7ab449d93e90371fe31f"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

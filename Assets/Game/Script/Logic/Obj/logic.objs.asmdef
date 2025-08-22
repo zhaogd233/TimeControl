@@ -1,0 +1,22 @@
+{
+  "name": "logic.obj",
+  "rootNamespace": "",
+  "references": [
+    "GUID:b4bcf38c29202044281f43458c29a1f8",
+    "GUID:2f2bd4a792a0f644a8d1c8012e762acb",
+    "GUID:f51ebe6a0ceec4240a699833d6309b23",
+    "GUID:9b8868242064e1243afe1703aad6f821",
+    "GUID:90129a3031f91054a9610f34c9199bec",
+    "GUID:8342b7c9d4acb9c4cab9cea3bcf13166",
+    "GUID:0d42c68dda22c5b449ccf9771b5923ae"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

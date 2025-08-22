@@ -1,0 +1,328 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Core.TVA
+{
+    public enum Direct
+    {
+        Forward, //正向
+        Rewind //回溯
+    }
+
+    public abstract class TCableBase<T> : MonoBehaviour, ITCable
+    {
+        public bool bDebug;
+
+        /// <summary>
+        ///     主控开关，主控无效，其他tcable不再更新记录&回溯
+        /// </summary>
+        public bool MainTCable;
+
+        [HideInInspector] public Direct TCDirect = Direct.Forward;
+
+        private float _destoryTime;
+
+        private float _escapeTime;
+
+        /// <summary>
+        ///     已回溯时间
+        /// </summary>
+        private float _lastRewindSeconds;
+
+        private float _maxSecond;
+
+        private TVRingBuffer<T> _recordbuffer;
+        private Action _rewindHeadAction;
+
+        private Action DestoryCompeletyAction;
+
+        private int forwardRate = 1;
+        private int rewindRate = 1;
+        public bool IsDestorying { private set; get; } //标记已被逻辑销毁，但可能会回溯出来
+
+        protected virtual void Start()
+        {
+            InitTCObj();
+            SetDebug(bDebug);
+        }
+
+        public void Tick(float deltaTime)
+        {
+            if (TCDirect == Direct.Forward)
+            {
+                if (IsDestorying)
+                {
+                    if (_destoryTime > _maxSecond)
+                        DestoryCompeletyInternal();
+                    else
+                        _destoryTime += deltaTime * forwardRate;
+                }
+                else
+                {
+                    ForwardInternal(deltaTime);
+                }
+            }
+            else
+            {
+                if (IsDestorying)
+                {
+                    if (_destoryTime > 0)
+                    {
+                        _destoryTime -= deltaTime * rewindRate;
+                    }
+                    else
+                    {
+                        IsDestorying = false;
+                        _destoryTime = 0;
+                    }
+                }
+                else
+                {
+                    RewindInternal(deltaTime);
+                }
+            }
+        }
+
+        public bool IsMainTCable()
+        {
+            return MainTCable;
+        }
+
+        public bool ValidMainTCable()
+        {
+            return !IsDestorying && CheckMainValid();
+        }
+
+        public void Forward(int rate)
+        {
+            TCDirect = Direct.Forward;
+            forwardRate = Mathf.Max(rate, forwardRate);
+            _lastRecordCount = 0;
+        }
+
+        /// <summary>
+        ///     回溯&加速
+        ///     往回播是回溯，从已有的时间加速还是算回溯
+        /// </summary>
+        /// <param name="seconds"></param>
+        /// <param name="rate"></param>
+        public void Rewind(int rate, Action rewindHeadRecordAction)
+        {
+            TCDirect = Direct.Rewind;
+            _rewindHeadAction = rewindHeadRecordAction;
+            _lastRewindSeconds = 0;
+            rewindRate = rate;
+        }
+
+        public void FinishTimeControl()
+        {
+            if (_recordbuffer == null)
+            {
+                Debug.LogError("尚未调用Initialized");
+                return;
+            }
+
+            if (TCDirect == Direct.Rewind)
+            {
+                TCDirect = Direct.Forward;
+
+                //回溯结束，通知上层逻辑继续执行逻辑运算
+                if (!IsDestorying && TryGetRecordValue(_lastRewindSeconds, out var valuesToRead))
+                    FinishRewindAction(valuesToRead);
+                _recordbuffer.MoveLastBufferPos(_lastRewindSeconds);
+                _escapeTime -= _lastRewindSeconds;
+                _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
+                _lastRewindSeconds = 0;
+                rewindRate = 1;
+            }
+            else
+            {
+                forwardRate = 1;
+                TCDirect = Direct.Forward;
+            }
+        }
+
+        /// <summary>
+        ///     销毁的时候，先disable,等过了记录周期之后，才彻底销毁
+        /// </summary>
+        public void FakeDestroy(Action OnComplete = null)
+        {
+            DestoryCompeletyAction = OnComplete;
+            IsDestorying = true;
+            _destoryTime = 0;
+        }
+
+        public void DestroyImmediate(Action OnComplete = null)
+        {
+            DestoryCompeletyAction = OnComplete;
+            IsDestorying = true;
+            DestoryCompeletyInternal();
+        }
+
+        /// <summary>
+        ///     初始化存储数据
+        /// </summary>
+        public void Initialized(int maxSecond, float updateDelta, int maxRate, IEqualityComparer<T> comparer)
+        {
+            _maxSecond = maxSecond;
+            _maxRate = maxRate;
+            var countPerSec = (int)(1.0f / updateDelta);
+            _recordbuffer = new TVRingBuffer<T>(maxSecond * countPerSec / maxRate, countPerSec, maxRate, comparer);
+        }
+
+        /// <summary>
+        ///     正播&加速
+        ///     只有从没有的数据开始播，才算记录，旧的加速还是回溯。
+        ///     rate 倍速要写多份
+        /// </summary>
+        private void ForwardInternal(float delaTime)
+        {
+            _escapeTime += delaTime * forwardRate;
+            _escapeTime = Mathf.Clamp(_escapeTime, 0, _maxSecond);
+            var value = GetCurTrackData(forwardRate);
+
+            //只记录需要播放帧的数据
+            if (forwardRate > 1)
+            {
+                RecordValue(value);
+            }
+            else
+            {
+                if (_lastRecordCount == 0) RecordValue(value);
+                _lastRecordCount++;
+                if (_lastRecordCount >= _maxRate)
+                    _lastRecordCount = 0;
+            }
+        }
+
+        private void RewindInternal(float deltaTime)
+        {
+            var offsetRewindSeconds = _lastRewindSeconds + deltaTime * rewindRate;
+            if (offsetRewindSeconds < 0)
+                return;
+
+            //当回溯到0的时候，回调上层，有些新创建的就需要销毁
+            if (offsetRewindSeconds > _escapeTime)
+            {
+                if (_rewindHeadAction != null)
+                    _rewindHeadAction();
+                return;
+            }
+
+            _lastRewindSeconds = offsetRewindSeconds;
+
+            if (TryGetRecordValue(offsetRewindSeconds, out var valuesToRead))
+                RewindAction(valuesToRead);
+        }
+
+        /// <summary>
+        ///     写入当前值
+        /// </summary>
+        /// <param name="value"></param>
+        public void RecordValue(T value)
+        {
+            if (_recordbuffer == null)
+            {
+                Debug.LogError("尚未调用Initialized");
+                return;
+            }
+
+            _recordbuffer.RecordValue(value);
+        }
+
+        public bool TryGetRecordValue(float seconds, out T value)
+        {
+            if (_recordbuffer == null)
+            {
+                Debug.LogError("尚未调用Initialized");
+                value = default;
+                return false;
+            }
+
+            value = _recordbuffer.ReadValue(seconds);
+            return true;
+        }
+
+        public void DestoryCompeletyInternal()
+        {
+            if (_recordbuffer == null)
+            {
+                Debug.LogError("尚未调用Initialized");
+                return;
+            }
+
+            if (DestoryCompeletyAction != null)
+                DestoryCompeletyAction();
+
+            _recordbuffer.Clear();
+        }
+
+        public void SetDebug(bool b)
+        {
+            if (_recordbuffer == null)
+            {
+                Debug.LogError("尚未调用Initialized");
+                return;
+            }
+
+            _recordbuffer.SetDebug(b);
+        }
+
+        public float GetRecordTime()
+        {
+            return _escapeTime - _lastRewindSeconds;
+        }
+
+        public float GetDestroyingTime()
+        {
+            return _destoryTime;
+        }
+
+        public bool IsTimeControling()
+        {
+            return rewindRate > 1 || forwardRate > 1;
+        }
+
+        #region 记录优化，根据倍速记录，只记录需要播放的帧数据
+
+        private int _maxRate = 1;
+        private int _lastRecordCount;
+
+        #endregion
+
+        #region 子类需要去实现的具体逻辑
+
+        protected abstract void InitTCObj();
+
+        /// <summary>
+        ///     获取当前正播记录信息
+        /// </summary>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        protected abstract T GetCurTrackData(float rate);
+
+        /// <summary>
+        ///     根据记录数据回溯当前行为
+        /// </summary>
+        /// <param name="curValue"></param>
+        protected abstract void RewindAction(T curValue);
+
+        /// <summary>
+        ///     通知上层最后rewind的状态
+        /// </summary>
+        /// <param name="rewindValue"></param>
+        protected abstract void FinishRewindAction(T rewindValue);
+
+        /// <summary>
+        ///     主控对象，当前是否有效（可见）
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool CheckMainValid()
+        {
+            return true;
+        }
+
+        #endregion
+    }
+}

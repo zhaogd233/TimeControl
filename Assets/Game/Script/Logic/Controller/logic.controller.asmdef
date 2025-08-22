@@ -1,0 +1,26 @@
+{
+  "name": "logic.controller",
+  "rootNamespace": "",
+  "references": [
+    "GUID:6310d3c5dff4ed94b934d71928c1095d",
+    "GUID:ff94a76ca24289449b16f5bcb8a91b8d",
+    "GUID:a28f182af7b476543b0ed250f5419bb6",
+    "GUID:72d430584fae5a448a2defde6ddf1ff9",
+    "GUID:6760a6cfe1dbaaa4b85cf1e7eed15bfc",
+    "GUID:4d4a86a57da980043b3285df2c75d566",
+    "GUID:0d42c68dda22c5b449ccf9771b5923ae",
+    "GUID:b4bcf38c29202044281f43458c29a1f8",
+    "GUID:0539a5a128853e74991abce57fcda51a",
+    "GUID:0025e7810782c034bbb8068a8f0bda7a",
+    "GUID:2f2bd4a792a0f644a8d1c8012e762acb"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

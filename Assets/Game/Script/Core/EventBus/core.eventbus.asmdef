@@ -1,0 +1,16 @@
+{
+  "name": "core.eventbus",
+  "rootNamespace": "",
+  "references": [
+    "GUID:2f2bd4a792a0f644a8d1c8012e762acb"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
